@@ -31,8 +31,10 @@
 <meta property="og:image" content="http://yoursite.com/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/python%E7%89%88%E6%9C%AC.png">
 <meta property="og:image" content="http://yoursite.com/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/docker_image_ls.png">
 <meta property="og:image" content="http://yoursite.com/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/push_fail.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/push_success.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/docker_hub.png">
 <meta property="article:published_time" content="2020-08-27T07:15:27.000Z">
-<meta property="article:modified_time" content="2020-08-27T09:31:14.534Z">
+<meta property="article:modified_time" content="2020-08-27T16:09:28.306Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="云计算">
 <meta property="article:tag" content="开发环境">
@@ -194,10 +196,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-08-27 15:15:27 / Modified: 17:31:14" itemprop="dateCreated datePublished" datetime="2020-08-27T15:15:27+08:00">2020-08-27</time>
+              <time title="Created: 2020-08-27 15:15:27" itemprop="dateCreated datePublished" datetime="2020-08-27T15:15:27+08:00">2020-08-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-28 00:09:28" itemprop="dateModified" datetime="2020-08-28T00:09:28+08:00">2020-08-28</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -223,9 +231,13 @@
 <h3 id="为什么使用Docker？"><a href="#为什么使用Docker？" class="headerlink" title="为什么使用Docker？"></a>为什么使用Docker？</h3><ol>
 <li>开发的程序最终的运行环境为Linux，开发环境不方便调试，并且避免了“代码在我电脑上没问题”的情况；</li>
 <li>MacOS上并没有好用的SSH管理工具，Windows上则有很多方便快捷的工具，直接使用ssh命令会出现掉线，文件传输不方便等情况，Docker则可以直接将主机目录挂载到；</li>
-<li>Docker是轻量级的容器，相比虚拟机而言，对电脑性能的要求更低。</li>
+<li>Docker是轻量级的容器，相比虚拟机而言，对电脑资源的要求更低，启动速度更快。</li>
 </ol>
-<h3 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h3><h3 id="获取一个镜像Image"><a href="#获取一个镜像Image" class="headerlink" title="获取一个镜像Image"></a>获取一个镜像Image</h3><p>Docker 官方维护了一个公共仓库 Docker Hub，我们可以直接从 Docker Hub 中获取我们想要的镜像。我们通过以下命令获取 Ubuntu 18.04 的最小镜像。</p>
+<a id="more"></a>
+
+<h3 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h3><p><code>$ brew cask install docker</code></p>
+<p>如果在使用过程中发现拉取 Docker 镜像十分缓慢，可以配置 Docker <a target="_blank" rel="noopener" href="https://vuepress.mirror.docker-practice.com/install/mirror.html#ubuntu-16-04-%E3%80%81debian-8-%E3%80%81centos-7">国内镜像加速</a>。</p>
+<h3 id="获取一个镜像Image"><a href="#获取一个镜像Image" class="headerlink" title="获取一个镜像Image"></a>获取一个镜像Image</h3><p>Docker 官方维护了一个公共仓库 Docker Hub，我们可以直接从 Docker Hub 中获取我们想要的镜像。我们通过以下命令获取 Ubuntu 18.04 的最小镜像。</p>
 <p><code>$ docker pull ubuntu:18.04</code></p>
 <h3 id="运行一个容器Container"><a href="#运行一个容器Container" class="headerlink" title="运行一个容器Container"></a>运行一个容器Container</h3><p>运行交互式容器，这样你就进入了一个神奇的Ubuntu bash环境，但是这是一个最小镜像，缺少各种组件，这就需要自行配置安装了。</p>
 <p><code>$ docker run -i -t ubuntu:18.04 /bin/bash</code></p>
@@ -261,8 +273,15 @@
 <p><code>$ docker tag network:probeDNS cido321/network:probeDNS</code></p>
 <p>修改成功后，再次push</p>
 <p><code>$ docker push cido321/network:probeDNS</code></p>
+<p>成功啦～当然默认是 Public 的，可以手动设置为 Private</p>
+<p><img src="/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/push_success.png" alt="图片无法显示"></p>
+<p><img src="/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/docker_hub.png" alt="图片无法显示"></p>
 <p>当特殊情况下无法使用互联网，或网络较慢时，使用以下命令导出镜像为文件</p>
 <p><code>$ docker save -o ubuntu_network.tar cido321/network</code></p>
+<p>与之对应的导入镜像命令为：</p>
+<p><code>$ docker load -i ubuntu_network.tar</code></p>
+<p>以上就是我首次使用 Docker 的一些方法和心得啦～</p>
+<p><strong>参考：</strong><br><a target="_blank" rel="noopener" href="https://vuepress.mirror.docker-practice.com/introduction/">Docker从入门到实践</a><br><a target="_blank" rel="noopener" href="https://docs.docker.com/">Docker 官方文档</a></p>
 
     </div>
 
@@ -285,7 +304,10 @@
     <a href="/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/" rel="prev" title="使用阿里云服务器搭建VPN加密流量">
       <i class="fa fa-chevron-left"></i> 使用阿里云服务器搭建VPN加密流量
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/" rel="next" title="The best bang for the byte: Characterizing the potential of DNS amplification attacks">
+      The best bang for the byte: Characterizing the potential of DNS amplification attacks <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -360,20 +382,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
