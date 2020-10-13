@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/Fig2.png">
 <meta property="og:image" content="http://yoursite.com/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/Fig5.png">
 <meta property="article:published_time" content="2020-09-08T06:54:15.000Z">
-<meta property="article:modified_time" content="2020-09-08T07:24:00.683Z">
+<meta property="article:modified_time" content="2020-10-13T12:35:15.084Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="文献阅读">
 <meta property="article:tag" content="DNS安全">
@@ -194,10 +194,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-09-08 14:54:15 / Modified: 15:24:00" itemprop="dateCreated datePublished" datetime="2020-09-08T14:54:15+08:00">2020-09-08</time>
+              <time title="Created: 2020-09-08 14:54:15" itemprop="dateCreated datePublished" datetime="2020-09-08T14:54:15+08:00">2020-09-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-10-13 20:35:15" itemprop="dateModified" datetime="2020-10-13T20:35:15+08:00">2020-10-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -232,7 +238,7 @@
 <h3 id="重要概念"><a href="#重要概念" class="headerlink" title="重要概念"></a>重要概念</h3><p>A record vs. ANY record：ANY能明显的带来放大系数的提升，但是不太常用，可能被过滤掉。A记录使用频繁，很难将攻击流量中合法流量中区分，如果主机过滤掉A记录，则它上不了Internet了。因此，一些攻击者更常使用A记录来逃避检测，而有些则为了更大的放大系数而使用ANY记录。</p>
 <p>EDNS(extension mechanisms for DNS)：EDNS可以突破DNS包512 bytes的限制，得到更大的返回包。但是EDNS的请求包需要增加OPT字段，大小为11 bytes。</p>
 <h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="实验数据"><a href="#实验数据" class="headerlink" title="实验数据"></a>实验数据</h4><p>zone files（包含了host names和domain+IP），分为3个数据集。<br><img src="/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/data.png" alt="图片无法显示"></p>
-<h4 id="实验方法"><a href="#实验方法" class="headerlink" title="实验方法"></a>实验方法</h4><p>发送12种请求：3<em>2</em>2=12<br><img src="/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/%E8%AF%B7%E6%B1%82%E7%B1%BB%E5%9E%8B.png" alt="图片无法显示"></p>
+<h4 id="实验方法"><a href="#实验方法" class="headerlink" title="实验方法"></a>实验方法</h4><p>发送12种请求：3*2*2=12<br><img src="/2020/09/08/Macfarland-2017-The-best-bang-for-the-byte-characte/%E8%AF%B7%E6%B1%82%E7%B1%BB%E5%9E%8B.png" alt="图片无法显示"></p>
 <p>程序设计：<br>程序包含以下两个部分：</p>
 <ol>
 <li>querying process：并行的发送请求。</li>
@@ -274,7 +280,10 @@
     <a href="/2020/08/27/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BA%E5%BA%94%E7%94%A8%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/" rel="prev" title="使用Docker搭建应用运行环境">
       <i class="fa fa-chevron-left"></i> 使用Docker搭建应用运行环境
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/13/ConfusedAboutWordAndFuture/" rel="next" title="对未来不确定性的焦虑，是时候为求职作准备了">
+      对未来不确定性的焦虑，是时候为求职作准备了 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -349,20 +358,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
