@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言限流，是服务或者应用对自身保护的一种手段，通过限制或者拒绝调用方的流量，来保证自身的负载。限流是保护高并发系统的三把利器之一，另外两个是缓存和降级。限流在很多场景中用来限制并发和请求量，比如说秒杀抢购，保护自身系统和下游系统不被巨型流量冲垮等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流及Google Guava RateLimiter解读">
+<meta property="og:url" content="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/index.html">
+<meta property="og:site_name" content="CidoBlog">
+<meta property="og:description" content="前言限流，是服务或者应用对自身保护的一种手段，通过限制或者拒绝调用方的流量，来保证自身的负载。限流是保护高并发系统的三把利器之一，另外两个是缓存和降级。限流在很多场景中用来限制并发和请求量，比如说秒杀抢购，保护自身系统和下游系统不被巨型流量冲垮等。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/1.png">
+<meta property="og:image" content="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/2.jpg">
+<meta property="og:image" content="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/3.png">
+<meta property="article:published_time" content="2021-02-24T04:16:32.000Z">
+<meta property="article:modified_time" content="2021-02-24T15:52:08.599Z">
+<meta property="article:author" content="Cido Liu">
+<meta property="article:tag" content="后端开发">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/1.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>限流及Google Guava RateLimiter解读 | CidoBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">CidoBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/dimo.jpg">
+      <meta itemprop="name" content="Cido Liu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CidoBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          限流及Google Guava RateLimiter解读
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-24 12:16:32 / Modified: 23:52:08" itemprop="dateCreated datePublished" datetime="2021-02-24T12:16:32+08:00">2021-02-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>限流，是服务或者应用对自身保护的一种手段，通过限制或者拒绝调用方的流量，来保证自身的负载。限流是保护高并发系统的三把利器之一，另外两个是缓存和降级。限流在很多场景中用来限制并发和请求量，比如说秒杀抢购，保护自身系统和下游系统不被巨型流量冲垮等。</p>
+<a id="more"></a>
+<h1 id="限流基础"><a href="#限流基础" class="headerlink" title="限流基础"></a>限流基础</h1><h2 id="限流的意义"><a href="#限流的意义" class="headerlink" title="限流的意义"></a>限流的意义</h2><p>其实很好理解的一个问题，为什么要限流，自然就流量过大了呗，一个对外服务有很多场景都会流量增大：</p>
+<ul>
+<li>业务用户量不断攀升</li>
+<li>各种促销</li>
+<li>网络爬虫</li>
+<li>恶意刷单</li>
+</ul>
+<p>注意这个”大”，1000QPS（permits per second）大吗？5000QPS大吗？10000QPS大么？没有答案，因为没有标准，因此，”大”一定是和正常流量相比的大。流量一大，服务器扛不住，扛不住就挂了，挂了没法提供对外服务导致业务直接熔断。怎么办，最直接的办法就是从源头把流量限制下来，例如服务器只有支撑1000QPS的处理能力，那就每秒放1000个请求，自然保证了服务器的稳定，这就是限流。</p>
+<h2 id="常用的限流方式："><a href="#常用的限流方式：" class="headerlink" title="常用的限流方式："></a>常用的限流方式：</h2><ol>
+<li>限制总并发数（比如数据库连接池、线程池）</li>
+<li>限制瞬时并发数（如nginx的limitconn模块，用来限制瞬时并发连接数，Java的Semaphore也可以实现）</li>
+<li>限制时间窗口内的平均速率（如<strong>Guava的RateLimiter</strong>、nginx的limitreq模块，限制每秒的平均速率）</li>
+<li>其他还有如限制远程接口调用速率、限制MQ的消费速率。另外还可以根据网络连接数、网络流量、CPU或内存负载等来限流。</li>
+</ol>
+<h1 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h1><p>常用的限流算法有两种：漏桶算法和令牌桶算法</p>
+<h2 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h2><p>漏桶算法的原理比较简单，水（请求）先进入到漏桶里，人为设置一个最大出水速率，漏桶以&lt;=出水速率的速度出水，当水流入速度过大会直接溢出（拒绝服务）：</p>
+<p><img src="/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/1.png" alt="漏桶算法"></p>
+<p>从上图中，我们可以看到，就像一个漏斗一样，进来的水量就好像访问流量一样，而出去的水量就像是我们的系统处理请求一样。当访问流量过大时，这个漏斗中就会积水，如果水太多了就会溢出。</p>
+<p>漏桶算法的实现往往依赖于队列，请求到达如果队列未满则直接放入队列，然后有一个处理器按照固定频率从队列头取出请求进行处理。如果请求量大，则会导致队列满，那么新来的请求就会被抛弃。</p>
+<p><img src="/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/2.jpg" alt="漏桶算法"></p>
+<p>因此，这个算法的核心为：</p>
+<ul>
+<li>存下请求</li>
+<li>匀速处理</li>
+<li>多于丢弃</li>
+</ul>
+<p>因此这是一种强行限制请求速率的方式，但是缺点非常明显，主要有两点：</p>
+<ol>
+<li>无法面对突发的大流量—-比如请求处理速率为1000，容量为5000，来了一波2000/s的请求持续10s，那么后5s的请求将全部直接被丢弃，服务器拒绝服务，但是实际上网络中突发一波大流量尤其是短时间的大流量是非常正常的，超过容量就拒绝，非常简单粗暴</li>
+<li>无法有效利用网络资源—-比如虽然服务器的处理能力是1000/s，但这不是绝对的，这个1000只是一个宏观服务器处理能力的数字，实际上一共5秒，每秒请求量分别为1200、1300、1200、500、800，平均下来qps也是1000/s，但是这个量对服务器来说完全是可以接受的，但是因为限制了速率是1000/s，因此前面的三秒，每秒只能处理掉1000个请求而一共打回了700个请求，白白浪费了服务器资源</li>
+</ol>
+<p>所以，通常来说利用漏桶算法来限流，实际场景下用得不多。</p>
+<h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><p>令牌桶算法是网络流量整形（Traffic Shaping）和限流（Rate Limiting）中最常使用的一种算法，它可用于控制发送到网络上数据的数量并允许突发数据的发送。</p>
+<p>从某种意义上来说，令牌桶算法是对漏桶算法的一种改进，主要在于令牌桶算法能够在限制调用的平均速率的同时还允许一定程度的突发调用。与漏桶算法不同的是，令牌桶算法是一个存放固定容量令牌的桶，按照固定速率往桶里添加令牌。桶中存放的令牌数有最大上限，超出之后就被丢弃或者拒绝。当流量或者网络请求到达时，每个请求都要获取一个令牌，如果能够获取到，则直接处理，并且令牌桶删除一个令牌。如果获取不到，该请求就要被限流，拒绝服务，要么直接丢弃，要么在缓冲区等待。</p>
+<p><img src="/2021/02/24/RateLimiter%E8%A7%A3%E8%AF%BB/3.png" alt="令牌桶算法"></p>
+<p>整个的过程是这样的：</p>
+<ul>
+<li>系统以恒定的速率产生令牌，然后将令牌放入令牌桶中</li>
+<li>令牌桶有一个容量，当令牌桶满了的时候，再向其中放入的令牌就会被丢弃</li>
+<li>每次一个请求过来，需要从令牌桶中获取一个令牌，假设有令牌，那么提供服务；假设没有令牌，那么拒绝服务</li>
+</ul>
+<p>那么，我们再看一下，为什么令牌桶算法可以防止一定程度的突发流量呢？可以这么理解，假设我们想要的速率是1000QPS，那么往桶中放令牌的速度就是1000个/s，假设第1秒只有800个请求，那意味着第2秒可以容许1200个请求，这就是一定程度突发流量的意思，反之我们看漏桶算法，第一秒只有800个请求，那么全部放过，第二秒这1200个请求将会被打回200个。</p>
+<p>注意上面多次提到一定程度这四个字，这也是我认为令牌桶算法最需要注意的一个点。假设还是1000QPS的速率，那么5秒钟放1000个令牌，第1秒钟800个请求过来，第2~4秒没有请求，那么按照令牌桶算法，第5秒钟可以接受4200个请求，但是实际上这已经远远超出了系统的承载能力，因此使用令牌桶算法特别注意设置桶中令牌的上限即可。</p>
+<p>总而言之，作为对漏桶算法的改进，令牌桶算法在限流场景下被使用更加广泛。</p>
+<h2 id="令牌桶和漏桶对比"><a href="#令牌桶和漏桶对比" class="headerlink" title="令牌桶和漏桶对比"></a>令牌桶和漏桶对比</h2><ul>
+<li><strong>令牌桶是按照固定速率往桶中添加令牌</strong>，请求是否被处理需要看桶中令牌是否足够，当令牌数减为零时则拒绝新的请求；<strong>漏桶则是按照常量固定速率流出请求</strong>，流入请求速率任意，当流入的请求数累积到漏桶容量时，则新流入的请求被拒绝；</li>
+<li><strong>令牌桶限制的是平均流入速率</strong>，允许突发请求，只要有令牌就可以处理，支持一次拿3个令牌，4个令牌；<strong>漏桶限制的是常量流出速率</strong>，即流出速率是一个固定常量值，比如都是1的速率流出，而不能一次是1，下次又是2，从而平滑突发流入速率；</li>
+<li>令牌桶允许一定程度的突发，而漏桶主要目的是平滑流出速率。</li>
+</ul>
+<h1 id="RateLimiter"><a href="#RateLimiter" class="headerlink" title="RateLimiter"></a>RateLimiter</h1><h2 id="平滑突发限流SmoothBursty"><a href="#平滑突发限流SmoothBursty" class="headerlink" title="平滑突发限流SmoothBursty"></a>平滑突发限流SmoothBursty</h2><p>RateLimiter 的使用方法实例如下，使用 RateLimiter的静态方法创建一个限流器，设置每秒放置的令牌数为5个。返回的RateLimiter对象可以保证1秒内不会给超过5个令牌，并且以固定速率进行放置，达到平滑输出的效果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSmoothBursty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    RateLimiter r = RateLimiter.create(<span class="number">5</span>);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + r.acquire() + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>create方法用于构建既定速度的实例，acquire方法使用阻塞方式获取令牌。</p>
+<p>源代码中涉及到以下属性：</p>
+<ul>
+<li>SleepingStopwatch 基础计时器</li>
+<li>storedPermits 当前存储的令牌数量</li>
+<li>maxPermits 最大能存储令牌数量</li>
+<li>stableIntervalMicros 两个单元请求之间的间隔，以我们稳定的速度。 例如，每秒5个许可的稳定速率具有200ms的稳定间隔。</li>
+<li>nextFreeTicketMicros 下一个请求（无论其大小）将被批准的时间。由于RateLimiter允许预消费，上次请求预消费令牌后，下次请求需要等待相应的时间到nextFreeTicketMicros时刻才可以获取令牌。</li>
+</ul>
+<p>RateLimiter的原理就是每次调用acquire时用当前时间和nextFreeTicketMicros进行比较，根据二者的间隔和添加单位令牌的时间间隔 stableIntervalMicros来刷新存储令牌数storedPermits。然后acquire会进行休眠，直到nextFreeTicketMicros。</p>
+<h3 id="create方法"><a href="#create方法" class="headerlink" title="create方法"></a>create方法</h3><p>create的源代码如下，创建具有指定稳定吞吐量的RateLimiter，以“permits per second”（通常称为QPS，每秒查询）给出，上述实例中，QPS = 5。并创建一个计时器SleepingStopwatch。</p>
+<p>创建的RateLimiter确保在给定的每秒内平均发出的许可数不超过QPS，而持续的请求则每秒平滑地传播。 当传入的请求速率超过QPS时，速率限制器将每（1.0 / QPS）秒释放一个许可。 当未使用速率限制器时，将允许突发最高允许QPS的许可，随后的请求将以QPS的稳定速率进行平滑限制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RateLimiter <span class="title">create</span><span class="params">(<span class="keyword">double</span> permitsPerSecond)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> create(permitsPerSecond, SleepingStopwatch.createFromSystemTimer());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@VisibleForTesting</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> RateLimiter <span class="title">create</span><span class="params">(<span class="keyword">double</span> permitsPerSecond, SleepingStopwatch stopwatch)</span> </span>&#123;</span><br><span class="line">  RateLimiter rateLimiter = <span class="keyword">new</span> SmoothBursty(stopwatch, <span class="number">1.0</span> <span class="comment">/* maxBurstSeconds */</span>);</span><br><span class="line">  rateLimiter.setRate(permitsPerSecond);</span><br><span class="line">  <span class="keyword">return</span> rateLimiter;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>maxBurstSeconds固定为1，说明令牌桶中所能存储的的最大令牌数是1*QPS。</p>
+<p>接着调用setRate方法，该方法初始化一些重要的参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">setRate</span><span class="params">(<span class="keyword">double</span> permitsPerSecond)</span> </span>&#123;</span><br><span class="line">    checkArgument(</span><br><span class="line">        permitsPerSecond &gt; <span class="number">0.0</span> &amp;&amp; !Double.isNaN(permitsPerSecond), <span class="string">&quot;rate must be positive&quot;</span>);</span><br><span class="line">    <span class="keyword">synchronized</span> (mutex()) &#123;</span><br><span class="line">      doSetRate(permitsPerSecond, stopwatch.readMicros());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着在同步代码块的互斥锁synchronized (mutex())中调用doSetRate，主要实现在SmoothRateLimiter中，初始化stableIntervalMicros，该字段表示1/QPS，即生产令牌的速率。：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">doSetRate</span><span class="params">(<span class="keyword">double</span> permitsPerSecond, <span class="keyword">long</span> nowMicros)</span> </span>&#123;</span><br><span class="line">    resync(nowMicros);</span><br><span class="line">    <span class="keyword">double</span> stableIntervalMicros = SECONDS.toMicros(<span class="number">1L</span>) / permitsPerSecond;</span><br><span class="line">    <span class="keyword">this</span>.stableIntervalMicros = stableIntervalMicros;</span><br><span class="line">    doSetRate(permitsPerSecond, stableIntervalMicros);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>其中resync方法是一个关键的方法，在请求令牌时也会用到，后面会详细说明。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">resync</span><span class="params">(<span class="keyword">long</span> nowMicros)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// if nextFreeTicket is in the past, resync to now</span></span><br><span class="line">  <span class="keyword">if</span> (nowMicros &gt; nextFreeTicketMicros) &#123;</span><br><span class="line">    <span class="keyword">double</span> newPermits = (nowMicros - nextFreeTicketMicros) / coolDownIntervalMicros();</span><br><span class="line">    storedPermits = min(maxPermits, storedPermits + newPermits);</span><br><span class="line">    nextFreeTicketMicros = nowMicros;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从中可以看出，如果nowMicros大于nextFreeTicketMicros（初始为0L），会重新计算nextFreeTicketMicros和storedPermit的值。</p>
+<p>接着调用doSetRate方法，该方法在SmoothBursty类中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doSetRate</span><span class="params">(<span class="keyword">double</span> permitsPerSecond, <span class="keyword">double</span> stableIntervalMicros)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">double</span> oldMaxPermits = <span class="keyword">this</span>.maxPermits;</span><br><span class="line">      maxPermits = maxBurstSeconds * permitsPerSecond;</span><br><span class="line">      <span class="keyword">if</span> (oldMaxPermits == Double.POSITIVE_INFINITY) &#123;</span><br><span class="line">        <span class="comment">// if we don&#x27;t special-case this, we would get storedPermits == NaN, below</span></span><br><span class="line">        storedPermits = maxPermits;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        storedPermits =</span><br><span class="line">          (oldMaxPermits == <span class="number">0.0</span>)</span><br><span class="line">                ? <span class="number">0.0</span> <span class="comment">// initial state</span></span><br><span class="line">                : storedPermits * maxPermits / oldMaxPermits;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始化maxPermits和storePermits，后者永远不会大于前者。</p>
+<p>到此，rateLimiter初始化完成。除了resync方法，在不重新设置rate的情况，其他方法不在处理请求时用到，暂时忽略。</p>
+<h3 id="acquire方法"><a href="#acquire方法" class="headerlink" title="acquire方法"></a>acquire方法</h3><p>acquire方法的源代码如下，在实例代码中，调用acquire()方法，申请令牌，无参数表示申请一个。接着调用acquire(int permits)方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CanIgnoreReturnValue</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">acquire</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> acquire(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@CanIgnoreReturnValue</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> permits)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 计算获取令牌所需等待的时间</span></span><br><span class="line">  <span class="keyword">long</span> microsToWait = reserve(permits);</span><br><span class="line">  <span class="comment">// 进行线程sleep</span></span><br><span class="line">  stopwatch.sleepMicrosUninterruptibly(microsToWait);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1.0</span> * microsToWait / SECONDS.toMicros(<span class="number">1L</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>acquire中首先调用reserve，reserve方法返回获取令牌所需要等待的时间，stopwatch阻塞当前线程，然后使用不SleepStopwatch休眠microsToWait时间，最后返回线程休眠的秒数。</p>
+<p>如果microsToWait为0，表示立即返回。reserve需要获取锁才可以操作，这也是令牌桶线程安全的原因，以下操作都在同步代码块中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">long</span> <span class="title">reserve</span><span class="params">(<span class="keyword">int</span> permits)</span> </span>&#123;</span><br><span class="line">  checkPermits(permits);</span><br><span class="line">  <span class="comment">// 由于涉及并发操作，所以使用synchronized进行并发操作</span></span><br><span class="line">  <span class="keyword">synchronized</span> (mutex()) &#123;</span><br><span class="line">    <span class="keyword">return</span> reserveAndGetWaitLength(permits, stopwatch.readMicros());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在reserve中首先调用checkPermits方法对参数进行验证。然后在reserve中继续调用reserveAndGetWaitLength方法，获取可以使用令牌的时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">long</span> <span class="title">reserveAndGetWaitLength</span><span class="params">(<span class="keyword">int</span> permits, <span class="keyword">long</span> nowMicros)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 计算能够获取到目标数量令牌时的时间</span></span><br><span class="line">  <span class="keyword">long</span> momentAvailable = reserveEarliestAvailable(permits, nowMicros);</span><br><span class="line">  <span class="comment">// 两个时间相减，获得需要等待的时间</span></span><br><span class="line">  <span class="keyword">return</span> max(momentAvailable - nowMicros, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在reserveAndGetWaitLength方法中，首先调用reserveEarliestAvailable，方法名说明了返回值的意义：即返回满足当前请求的最早的时钟，该值大于等于nowMicros。</p>
+<p>reserveEarliestAvailable是刷新令牌数和下次获取令牌时间 nextFreeTicketMicros的关键函数。它有三个步骤，一是调用resync函数增加（刷新）令牌数，二是计算预支付令牌所需额外等待的时间，三是更新下次获取令牌时间 nextFreeTicketMicros和存储令牌数 storedPermits。</p>
+<p>这里涉及 RateLimiter的一个特性，也就是可以<strong>预先支付令牌</strong>，并且所需等待的时间在下次获取令牌时再实际执行。</p>
+<p>如何保证这一点的呢？我们看reserveEarliestAvailable方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">long</span> <span class="title">reserveEarliestAvailable</span><span class="params">(<span class="keyword">int</span> requiredPermits, <span class="keyword">long</span> nowMicros)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 刷新令牌数，相当于每次acquire时在根据时间进行令牌的刷新</span></span><br><span class="line">  resync(nowMicros);</span><br><span class="line">  <span class="keyword">long</span> returnValue = nextFreeTicketMicros;</span><br><span class="line">  <span class="comment">// 获取当前已有的令牌数和需要获取的目标令牌数进行比较，计算出可以目前即可得到的令牌数</span></span><br><span class="line">  <span class="keyword">double</span> storedPermitsToSpend = min(requiredPermits, <span class="keyword">this</span>.storedPermits);</span><br><span class="line">  <span class="comment">// freshPermits是需要预先支付的令牌，也就是目标令牌数减去目前即可得到的令牌数</span></span><br><span class="line">  <span class="keyword">double</span> freshPermits = requiredPermits - storedPermitsToSpend;</span><br><span class="line">  <span class="comment">// 因为会突然涌入大量请求，而现有令牌数又不够用，因此会预先支付一定的令牌数</span></span><br><span class="line">  <span class="comment">// waitMicros即是产生预先支付令牌的数量时间，则将下次要添加令牌的时间应该计算时间加上watiMicros</span></span><br><span class="line">  <span class="keyword">long</span> waitMicros =</span><br><span class="line">      storedPermitsToWaitTime(<span class="keyword">this</span>.storedPermits, storedPermitsToSpend)</span><br><span class="line">          + (<span class="keyword">long</span>) (freshPermits * stableIntervalMicros);</span><br><span class="line">  <span class="comment">// 更新nextFreeTicketMicros,本次预先支付的令牌所需等待的时间让下一次请求来实际等待</span></span><br><span class="line">  <span class="keyword">this</span>.nextFreeTicketMicros = LongMath.saturatedAdd(nextFreeTicketMicros, waitMicros);</span><br><span class="line">  <span class="comment">// 更新令牌数，最低数量为0</span></span><br><span class="line">  <span class="keyword">this</span>.storedPermits -= storedPermitsToSpend;</span><br><span class="line">  <span class="comment">// 返回旧的nextFreeTicketMicros数值，无需为预支付的令牌多加等待时间</span></span><br><span class="line">  <span class="keyword">return</span> returnValue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">resync</span><span class="params">(<span class="keyword">long</span> nowMicros)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// if nextFreeTicket is in the past, resync to now</span></span><br><span class="line">  <span class="comment">// 当前时间晚于nextFreeTicketMicros，所以刷新令牌和nextFreeTicketMicros</span></span><br><span class="line">  <span class="keyword">if</span> (nowMicros &gt; nextFreeTicketMicros) &#123;</span><br><span class="line">    <span class="comment">// coolDownIntervalMicros函数获取每机秒生成一个令牌，SmoothWarmingUp和SmoothBuresty的实现不同</span></span><br><span class="line">    <span class="comment">// SmoothBuresty的coolDownIntervalMicros直接返回stableIntervalMicros</span></span><br><span class="line">    <span class="comment">// 当前时间减去要更新令牌的时间获取时间间隔，再除以添加令牌时间间隔获取这段时间内要添加的令牌数</span></span><br><span class="line">    <span class="keyword">double</span> newPermits = (nowMicros - nextFreeTicketMicros) / coolDownIntervalMicros();</span><br><span class="line">    storedPermits = min(maxPermits, storedPermits + newPermits);</span><br><span class="line">    <span class="comment">// 如果当前时间早于nextFreeTicketMicros，则获取令牌的线程要一直等待到nextFreeTicketMicros</span></span><br><span class="line">    <span class="comment">// 该线程获取令牌所需额外等待的时间由下一次获取的线程来代替等待</span></span><br><span class="line">    nextFreeTicketMicros = nowMicros;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>resync函数用于增加（刷新）存储令牌，核心逻辑就是 (nowMicros-nextFreeTicketMicros)/stableIntervalMicros。当前时间大于 nextFreeTicketMicros时进行刷新，否则直接返回。</p>
+<p>这十多行代码是整个算法实现的核心，重点说明：</p>
+<ol>
+<li>首先调用resync(nowMicros)，更新storedPermits（当前存储的令牌数量）和nextFreeTicketMicros（下一个请求将被批准的时间）。如果nowMicros在nextFreeTicketMicros之后，nextFreeTicketMicros=nowMicros，并往storedPermits中增加这段时间能产生的令牌。<br>返回值设置为当前的nextFreeTicketMicros。为什么要这样设置呢？因为如果nowMicros大于nextFreeTicketMicros，说明令牌桶肯定能满足需求（无论请求的令牌数目是多少），而resync方法已经修改了nextFreeTicketMicros值为nowMicros值，逐层返回给调用者时，等待时间为0，线程无需等待；反之，如果nowMicros小于等于nextFreeTicketMicros，说明请求过快，线程需要等待，等待的时间就是nextFreeTicketMicros-nowMicros。</li>
+<li>接下来，storedPermitsToSpend代表令牌桶中已有的令牌数，可以用于当前的请求。但未必满足需求。</li>
+<li>其次，freshPermits代表需要新生成的令牌数。如果storedPermits已经满足需求，则freshPermits为0。</li>
+<li>再次，计算新生成令牌需要花费的时间waitMicros，这些需要后来者偿还。</li>
+<li>然后修改nextFreeTicketMicros的值。</li>
+<li>最后修改storedPermits值。</li>
+</ol>
+<p>至此整个处理过程结束。</p>
+<h3 id="自问自答"><a href="#自问自答" class="headerlink" title="自问自答"></a>自问自答</h3><ol>
+<li></li>
+</ol>
+<ul>
+<li><p>Q：调用resync更新令牌数量时，若当前时间nowMicros早于nextFreeTicketMicros时（nowMicros &lt; nextFreeTicketMicros），程序直接返回，不更新nextFreeTicketMicros。但在reserveEarliestAvailable函数中，并没有拦截后续代码的执行，如何实现限流的呢？</p>
+</li>
+<li><p>A：由于RateLimiter允许一定程度的突发，这里涉及 RateLimiter的一个特性，也就是可以预先支付令牌，并且所需等待的时间在下次获取令牌时再实际执行。当nowMicros &lt; nextFreeTicketMicros时，resync函数并未对nextFreeTicketMicros进行更新（nextFreeTicketMicros = nowMicros），reserveEarliestAvailable返回的时间nextFreeTicketMicros &gt; nowMicros，在reserveAndGetWaitLength函数中表现为momentAvailable &gt; nowMicros，即microsToWait &gt; 0，即acquire函数会对当前线程休眠max(momentAvailable - nowMicros, 0)时间，从而实现了等待效果。并且由于预支了令牌，reserveEarliestAvailable会同步更新当前的nextFreeTicketMicros值。</p>
+<p>  以如下代码为实例：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    RateLimiter rateLimiter = RateLimiter.create(<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + rateLimiter.acquire() + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* output</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.0s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.492575s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.494368s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.495195s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.494448s</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>  新建RateLimiter对象后，初始令牌数为0，第一个acquire()请求来时，预支了1个令牌，因此第二个acquire()需要偿还第一个acquire()请求预支的令牌后，再预支1个令牌，并且随着时间的推进，新增的令牌数用于赶不上消耗的令牌数，后续每一个acquire()请求都需要偿还先前一次预支的令牌时间。</p>
+</li>
+</ul>
+<ol start="2">
+<li></li>
+</ol>
+<ul>
+<li><p>Q：怎么理解RateLimiter为了应对突发流量的预先支付令牌特性？</p>
+</li>
+<li><p>A：以如下代码作为实例来理解预先支付令牌特性：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    RateLimiter rateLimiter = RateLimiter.create(<span class="number">2</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;get 4 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">4</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">1</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">1</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* output</span></span><br><span class="line"><span class="comment">get 4 tokens: 0.0s</span></span><br><span class="line"><span class="comment">get 1 tokens: 1.991897s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.493449s</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>  上述代码中，首先创建了一个permitsPerSecond = 2的RateLimiter对象，创建完成后拥有0个令牌。</p>
+<p>  在发起acquire(4)请求时，本实例的stableIntervalMicros较大，此时还未来得及产生新的令牌，因此storedPermits = 0；在reserveEarliestAvailable方法中，可用令牌数storedPermitsToSpend = 0，预支令牌数freshPermits = 4，所以waitMicros为产生4个新令牌所需时间（为了简便，忽略storedPermitsToWaitTime时间），在nextFreeTicketMicros上加上waitMicros形成新的nextFreeTicketMicros，之后更新storedPermits = 0，但是reserveEarliestAvailable仍然返回的是旧的nextFreeTicketMicros数值，即nowMicros，因此获取4个令牌无需等待。</p>
+<p>  在发起acquire(1)请求时，nextFreeTicketMicros为acquire(4)请求时的时间+预支4个令牌所需要的时间（1秒），因此nowMicros &lt; nextFreeTicketMicros，不更新令牌数storedPermits和nextFreeTicketMicros，此时令牌数storedPermits = 0。在reserveEarliestAvailable中，storedPermitsToSpend = 1， freshPermits = 1，因此需要预支1个令牌，但实际reserveEarliestAvailable返回的是旧的nextFreeTicketMicros数值，即产生4个新令牌所需时间，即2秒。因此在发起acquire(1)请求时，程序需sleep约2秒。</p>
+<p>  在发起第二个acquire(1)请求时，偿还上一次acquire(1)请求时预支的1个令牌产生需要的时间，即0.5秒。</p>
+<p>  实例2:</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    RateLimiter rateLimiter = RateLimiter.create(<span class="number">2</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;get 2 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">2</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;&#125;</span><br><span class="line">    System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">1</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;get 1 tokens: &quot;</span> + rateLimiter.acquire(<span class="number">1</span>) + <span class="string">&quot;s&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* output</span></span><br><span class="line"><span class="comment">get 2 tokens: 0.0s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.0s</span></span><br><span class="line"><span class="comment">get 1 tokens: 0.493068s</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>  经过上面的说明，实例2就很好理解了。acquire(2)请求首先预支了2个令牌，之后程序sleep1秒；在第一个acquire(1)时，nowMicros = nextFreeTicketMicros，无需sleep程序等待令牌，storedPermits = 0，预支1个令牌，更新nextFreeTicketMicros增加产生1个令牌的时间；在第二个acquire(1)时，还未满足增加产生1个令牌的时间，因此需要偿还前一次预支1个令牌的时间。</p>
+</li>
+</ul>
+<ol start="3">
+<li></li>
+</ol>
+<ul>
+<li>Q：使用create函数创建后，限流器中存储的令牌数量为多少，即storedPermits为多少？</li>
+<li>A：等于0。虽然在创建过程中，由于nowMicros &gt; nextFreeTicketMicros(=0)，且maxBurstSeconds默认为1.0L，因此在doSetRate(double permitsPerSecond, long nowMicros)中调用resync得到的storedPermits == maxPermits == 2，但是后来又调用了SmoothBursty.doSetRate(permitsPerSecond, stableIntervalMicros)了方法，将storedPermits重新设置为0。</li>
+</ul>
+<h2 id="平滑预热限流"><a href="#平滑预热限流" class="headerlink" title="平滑预热限流"></a>平滑预热限流</h2><p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/today__tomorrow/article/details/99287103?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control&dist_request_id=8f896975-7070-49b7-a355-8b11978e53e0&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control">Java限流——RateLimiter使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.imooc.com/article/290964">面试官：来谈谈限流-RateLimiter源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xrq730/p/11025029.html">最近学习了限流与RateLimiter</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/60979444">超详细的Guava RateLimiter限流原理解析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/226c7907905c">限流，从令牌桶算法到RateLimiter源码</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/bdf0c7941342">令牌桶算法及实现（二）</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/" rel="tag"># 后端开发</a>
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/20/iterm-ssh-question/" rel="prev" title="记录配置iTerm2的ssh自动登录服务器的坑">
+      <i class="fa fa-chevron-left"></i> 记录配置iTerm2的ssh自动登录服务器的坑
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%90%E6%B5%81%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">限流基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%90%E6%B5%81%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">限流的意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E9%99%90%E6%B5%81%E6%96%B9%E5%BC%8F%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用的限流方式：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">限流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">漏桶算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A4%E7%89%8C%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">令牌桶算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A4%E7%89%8C%E6%A1%B6%E5%92%8C%E6%BC%8F%E6%A1%B6%E5%AF%B9%E6%AF%94"><span class="nav-number">3.3.</span> <span class="nav-text">令牌桶和漏桶对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RateLimiter"><span class="nav-number">4.</span> <span class="nav-text">RateLimiter</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E6%BB%91%E7%AA%81%E5%8F%91%E9%99%90%E6%B5%81SmoothBursty"><span class="nav-number">4.1.</span> <span class="nav-text">平滑突发限流SmoothBursty</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.1.</span> <span class="nav-text">create方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#acquire%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.2.</span> <span class="nav-text">acquire方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E9%97%AE%E8%87%AA%E7%AD%94"><span class="nav-number">4.1.3.</span> <span class="nav-text">自问自答</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E6%BB%91%E9%A2%84%E7%83%AD%E9%99%90%E6%B5%81"><span class="nav-number">4.2.</span> <span class="nav-text">平滑预热限流</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cido Liu"
+      src="/images/dimo.jpg">
+  <p class="site-author-name" itemprop="name">Cido Liu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CidoLiu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CidoLiu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cidoliu@outlook.com" title="E-Mail → mailto:cidoliu@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cido Liu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
