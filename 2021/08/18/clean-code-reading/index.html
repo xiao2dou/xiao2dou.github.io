@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="看到一个说法，低级程序员的代码只有机器能看懂，中级程序员的代码人能看懂，高级程序员用业务语言写代码，也就是所说的DDD领域驱动设计。《Clean Code》这本书前后读了2次，第一次读没有太大的感受，常规的建议平时也都用上了，不少建议也感觉用不上；第二次是在实习中读的，公司的项目复杂，且团队合作开发，我需要维护别人的代码，别人也需要维护我的代码，每次PR之前也都需要请同学Review，若代码不够整">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Clean Code》读书笔记">
+<meta property="og:url" content="http://yoursite.com/2021/08/18/clean-code-reading/index.html">
+<meta property="og:site_name" content="CidoBlog">
+<meta property="og:description" content="看到一个说法，低级程序员的代码只有机器能看懂，中级程序员的代码人能看懂，高级程序员用业务语言写代码，也就是所说的DDD领域驱动设计。《Clean Code》这本书前后读了2次，第一次读没有太大的感受，常规的建议平时也都用上了，不少建议也感觉用不上；第二次是在实习中读的，公司的项目复杂，且团队合作开发，我需要维护别人的代码，别人也需要维护我的代码，每次PR之前也都需要请同学Review，若代码不够整">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-08-18T12:47:58.000Z">
+<meta property="article:modified_time" content="2021-08-18T13:35:03.636Z">
+<meta property="article:author" content="Cido Liu">
+<meta property="article:tag" content="总结">
+<meta property="article:tag" content="读书笔记">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/08/18/clean-code-reading/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>《Clean Code》读书笔记 | CidoBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">CidoBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/08/18/clean-code-reading/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/dimo_new.jpg">
+      <meta itemprop="name" content="Cido Liu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CidoBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Clean Code》读书笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-08-18 20:47:58 / Modified: 21:35:03" itemprop="dateCreated datePublished" datetime="2021-08-18T20:47:58+08:00">2021-08-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%BB%E4%B9%A6/" itemprop="url" rel="index"><span itemprop="name">读书</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>看到一个说法，低级程序员的代码只有机器能看懂，中级程序员的代码人能看懂，高级程序员用业务语言写代码，也就是所说的DDD领域驱动设计。《Clean Code》这本书前后读了2次，第一次读没有太大的感受，常规的建议平时也都用上了，不少建议也感觉用不上；第二次是在实习中读的，公司的项目复杂，且团队合作开发，我需要维护别人的代码，别人也需要维护我的代码，每次PR之前也都需要请同学Review，若代码不够整洁，对团队来说将是灾难性的。本文是读书过程中一些要点的摘录，书中有些观点可能过时了，但大部分建议还是非常有价值的，值得反复阅读，常读常新。</p>
+<a id="more"></a>
+
+<h1 id="第1章-整洁代码"><a href="#第1章-整洁代码" class="headerlink" title="第1章 整洁代码"></a>第1章 整洁代码</h1><h2 id="读书笔记"><a href="#读书笔记" class="headerlink" title="读书笔记"></a>读书笔记</h2><p><strong>几个观点</strong>：</p>
+<ul>
+<li>代码永存：需求模型、更抽象的自然语言、领域特定语言都不能取代代码的位置，事实上高层次的抽象语言和领域特定语言撰写的规约也属于代码，代码将永存。</li>
+<li>稍后等于永不：勒布朗法则，不要放任自己亲手写的混乱代码，不要满足于代码能运行，满足基本功能需求后要尽快重构代码，若想着有朝一日再整理，那可能就永远不会再整理了，也可能想再整理也难以看懂自己写的糟糕的代码。</li>
+<li>混乱的代价：对于团队合作的复杂的工程来说，随着需求的迭代，代码需要不断更新，混乱的代码将导致添加或修改代码困难，降低团队生产力，最终导致项目的失败。</li>
+<li>开发者心态：不要为了赶工期而写出不整洁的代码，因为制造混乱无助于赶上DDL，混乱只会拖慢你，导致在DDL前无法完成工作；开发者要主动遵循Clean Code原则，否则不是专业的开发者。</li>
+</ul>
+<p><strong>什么是整洁代码</strong>：每个人心中都要一套整洁代码的定义，但这些定义有很多共识，对于同一个开发团队来说，达成整洁代码的原则是重要的。<br>业界大佬们对什么是整洁代码有如下表述：</p>
+<ul>
+<li>优雅和高效：代码逻辑直截了当，减少依赖关系，性能调至最优。</li>
+<li>简单直接：整洁的代码如同优美的散文。</li>
+<li>可由作者之外的开发者阅读和增补：单元测试和验收测试、有意义的命名、一件事一种途径、尽量少的依赖关系、明确地定义和提供清晰且尽量少的API，好的代码即是注释。</li>
+<li>在意自己写的代码：全心全意的投入，不留改进的余地。</li>
+<li>Ron概括：不要重复的代码，只做一件事，表达力，小规模抽象。</li>
+</ul>
+<h2 id="总结反思"><a href="#总结反思" class="headerlink" title="总结反思"></a>总结反思</h2><p>《Clean Code》中展示优秀的开发者的思维过程、技巧、技术和工具，包含了很多通用的Clean规则和示例，作为初学者获取很难将这些很快用于编写实际代码中，但有以下几点能使得自己的代码更Clean：</p>
+<ul>
+<li>用心写代码：用心是一件很玄学的东西，但如果你在意自己写的代码，你绝对不会容忍它的混乱，对自己要求再高一点，对代码要求再高一点。</li>
+<li>假设自己是终身维护者：代码几乎不会是一次性的，肯定需要维护着，面对一份糟糕的代码，维护者只能抱头痛哭。如果能假象自己是写出来的代码的终身维护者，写出来的代码自己能很方便的维护，那么相信其他人也能快速上手了。</li>
+<li>重构、重构、重构：初级工程师很难一次性写出Clean Code，最初的代码可能只是满足功能需要，但若写代码代码后能及时重构代码，那也能使得代码变得整洁，不过要记住，稍后等于永不。</li>
+<li>遵循设计模式、框架：设计模式和框架是工业界实践经验的总结，其中包含了很多Clean Code的准则，遵循它们能使得自己的代码更Clean。</li>
+</ul>
+<blockquote>
+<p>“无忌，我教你的还记得多少？”<br>“回太师傅，我只记得一大半”<br>“ 那，现在呢？”<br>“已经剩下一小半了”<br>“那，现在呢？”<br>“我已经把所有的全忘记了！”<br>“好，你可以上了…” </p>
+</blockquote>
+<p>《Clean Code》中包含了大量的Clean小技巧，无需死记硬背这些技巧，努力培养自己的“代码感”，在不知不觉中实践《Clean Code》中的技巧。</p>
+<h1 id="第2章-有意义的命名"><a href="#第2章-有意义的命名" class="headerlink" title="第2章 有意义的命名"></a>第2章 有意义的命名</h1><h2 id="读书笔记-1"><a href="#读书笔记-1" class="headerlink" title="读书笔记"></a>读书笔记</h2><p>开发过程中命名随处可见，<strong>取个好名字的几条简单规则</strong>：</p>
+<ul>
+<li>名副其实：变量、函数或类命名表达了它为什么会存在，它做什么事，应该怎么用。好的命名不需要注释来补充。</li>
+<li>避免误导：避免前后不一致，避免数字1和小写字母l误导，避免滥用如List这样具有专门含义的词。</li>
+<li>做有意义的区分：如Product/ProductData/ProductInfo这三个类名，虽然名称相同，但表达的含义是相同的，让人难以区分。</li>
+<li>使用读得出来的名称：避免使用自造词，英文单词拼音混用等让人难以理解的名称。</li>
+<li>使用可搜索的名称：名称长短应与其作用域大小相对应。</li>
+<li>避免使用编码：现在还使用编码命名纯属自找麻烦。<ul>
+<li>匈牙利语标记法</li>
+<li>成员前缀</li>
+<li>接口和实现：接口前加字母‘I’已经被滥用了，要避免使用，加‘I’后用户知道我提供给他们的是一个接口。如果接口和实现必须选一个编码的话，可以考虑在实现后加‘Imp’。</li>
+</ul>
+</li>
+<li>避免映射思维：不应当让读者在脑中把名称映射为他们熟知的名称。</li>
+<li>类名、对象名：名词或名词短语。</li>
+<li>方法名：动词或动词短语。</li>
+<li>别扮可爱：说难听点就是别装B，用大家都容易理解的命名。</li>
+<li>每个概念对应一个词：独一无二，一以贯之。</li>
+<li>别用双关语：避免歧义，清晰清晰更清晰。</li>
+<li>使用解决方案领域名称：只有程序员才会读你的代码，客户只关心他们的问题。</li>
+<li>使用源自所涉问题领域的名称：如果没有合适的解决方案领域的名称，那么就用所涉问题领域的名称吧。</li>
+<li>添加有意义的语境：如收货地址中的收获人名，name显然不够自我说明，addrName则添加了有意义的语境。</li>
+<li>不要添加没用的语境：IDE有代码提示，这个提示是根据命名前缀来的，如果添加了没用的语境，导致很多命名前缀相同，那就很难快速定位到自己想要的名称了。</li>
+</ul>
+<h2 id="总结反思-1"><a href="#总结反思-1" class="headerlink" title="总结反思"></a>总结反思</h2><p>代码拥有好的命名只是Clean Code的第一步，借助于现代的开发工具，多数时候我们已经不需要记忆变量、函数或类名了，如果代码中拥有优雅的命名，那么阅读代码也会变得像读文章那么容易。如果维护别人的代码，如果代码难以阅读，则可以利用重构工具，从修改命名开始。</p>
+<h1 id="第3章-函数"><a href="#第3章-函数" class="headerlink" title="第3章 函数"></a>第3章 函数</h1><h2 id="读书笔记-2"><a href="#读书笔记-2" class="headerlink" title="读书笔记"></a>读书笔记</h2><p>函数是所有程序中的第一组代码，<strong>什么是好的函数</strong>：</p>
+<ul>
+<li>短小：短小更短小，20行封顶最佳；if、else、while语句中的代码块应该只有一行；函数的缩进层级不该多于一层或两层。</li>
+<li>只做一件事：函数应该做一件事。做好这件事。只做这一件事。只做一件事的函数无法被合理的切分为多个区段。</li>
+<li>每个函数一个抽象层级：要确保函数只做一件事，函数中的语句都要在同一抽象层级上【高抽象层、中抽象层、低抽象层】。满足自顶向下读代码的规则。</li>
+<li>switch语句：switch语句天生要做N件事，解决办法是将switch语句埋到抽象工厂底下，利用工厂模式，不让任何人看到；switch语句最好只出现在用户创建多态对象，隐藏在某个继承关系中。</li>
+<li>使用描述性的名称：注意函数命名，函数越短小、功能越集中，就越便于取个好名字。别害怕长名称、别害怕花时间取名字、命名方式要保持一致。</li>
+<li>函数参数：0个&gt;1个&gt;2个，应尽量避免3个参数，无论如何都不要使用3个以上的参数。<ul>
+<li>使用返回值代替转换（修改函数参数指向的对象属性）。</li>
+<li>不要向函数传递布尔值作为标识参数，很明显这表示函数将不止做一件事。</li>
+<li>二元参数比一元难懂，三元比二元难懂得多，且涉及到参数顺序的问题。</li>
+<li>可以向参数封装成参数对象</li>
+<li>好的函数名能较好的解释函数的意图，以及参数的顺序和意图。</li>
+</ul>
+</li>
+<li>无副作用：函数承诺只做一件事，但还是会做其他被隐藏起来的事情，要避免函数产生的副作用，破坏整个程序。要避免使用输出参数。</li>
+<li>分隔指令与询问：函数要么做什么事，要么回答什么事，不要柔和到一起，否则将产生混乱。</li>
+<li>使用异常替代返回错误码：Java支持异常机制，使用错误码也违反了分隔指令与询问原则。<ul>
+<li>抽离try/catch代码块：把代码块主体部分抽离出来，形成另外的函数。</li>
+<li>函数应该只做一件事，错误处理算一件事。</li>
+<li>使用错误码意味着某处有一个枚举类Error定义了错误码，这是一块“依赖磁铁”，许多类都要导入并使用它，如果Error类修改时，其他类都需要重新编译并部署；而如果使用异常，就能避免这样的依赖情况。</li>
+</ul>
+</li>
+<li>别重复自己：软件开发领域的所有创新都是在不断尝试从源代码中消灭重复。</li>
+<li>结构化编程：Edsger Dijkstra的结构化编程规则：每个函数、函数中的每个代码块都应该有一个入口、一个出口。意味着在每个函数中只该有一个return语句，循环中不能有break或continue语句，永远不能有任何goto语句。对于小函数，这些规则帮助不大；在大函数中，这些规则才有明显的好处。因此只要保持函数短小，偶尔出现的return、break、continue语句没有坏处。</li>
+</ul>
+<p><strong>如何写出这样的好函数</strong>：重构！重构！重构！</p>
+<pre><code>1. 一开始函数冗长而复杂。
+2. 打磨代码，分解函数、修改名称、消除重复。
+3. 组装函数。</code></pre>
+<h2 id="总结反思-2"><a href="#总结反思-2" class="headerlink" title="总结反思"></a>总结反思</h2><ul>
+<li>多个无逻辑关系的参数、冗长的函数、不清晰的函数名、多个return语句等函数风格是一场灾难，这将给程序可读性带来巨大的困难。</li>
+<li>很难一次性写出满足上述规则的函数，但可以在完成程序功能后，通过重构代码，来增强程序都可读性。</li>
+<li>尽量在开始写代码前设计好，开发时就遵循CleanCode的原则，如果强依赖性重构，在重构时可能在代码中引入新的风险。</li>
+</ul>
+<h1 id="第4章-注释"><a href="#第4章-注释" class="headerlink" title="第4章 注释"></a>第4章 注释</h1><h2 id="读书笔记-3"><a href="#读书笔记-3" class="headerlink" title="读书笔记"></a>读书笔记</h2><blockquote>
+<p>“别给糟糕的代码加注释——重写吧”</p>
+</blockquote>
+<ul>
+<li>好注释✅</li>
+<li>乱七八糟的注释⚠️</li>
+<li>陈旧的、错误的注视❌</li>
+</ul>
+<p><strong>为什么写注释</strong>：弥补我们在用代码表达意图时遭遇的失败。</p>
+<p><strong>什么是好注释</strong>：</p>
+<ul>
+<li>法律信息</li>
+<li>提供辅助信息：提供一些基本辅助理解代码的信息</li>
+<li>对意图的解释：程序员想干啥</li>
+<li>阐释：解释某些晦涩难懂的代码</li>
+<li>警示：警告其他程序员会出现的某种后果</li>
+<li>TODO：记录工作列表，定期查看，及时删除</li>
+<li>放大：放大某些看起来不合理事物的重要性</li>
+<li>公共API的Javadoc</li>
+</ul>
+<p><strong>什么是坏注释</strong>：</p>
+<ul>
+<li>喃喃自语：别人难以理解的注释</li>
+<li>多余的注释：一个简单直接的函数写上复杂的注释是没有必要的，读注释的时间比直接看代码的时间还长</li>
+<li>误导性的注释：误导性、不及时更新的注释将对使用者带来苦难</li>
+<li>循规性注释：不是每一个函数、每一个变量都要添加注释，只在必要的地方添加注释</li>
+<li>日志式注释：有了git，不用写代码修改日志了</li>
+<li>废话注释：喋喋不休，毫无意义的注释</li>
+<li>可怕的废话：废话还没那么可怕，可怕的是错误的废话</li>
+<li>能用函数或变量时就别用注释</li>
+<li>位置标记：现在的IDE很方便了，就别手动标记了</li>
+<li>括号后面的注释：同上</li>
+<li>归名与署名：有git</li>
+<li>注释掉的代码：有git</li>
+<li>html注释：由接口文档工具来处理，而不是在代码中添加</li>
+<li>非本地信息：注释离代码就近原则，不然难以及时更新</li>
+<li>信息过多</li>
+<li>不明显的联系</li>
+<li>函数头：短的函数起一个好的名字就行</li>
+<li>非公共代码中的Javadoc：Javadoc的形式像八股文一样，非公用的代码没必要</li>
+</ul>
+<h2 id="总结反思-3"><a href="#总结反思-3" class="headerlink" title="总结反思"></a>总结反思</h2><ul>
+<li>好的代码就是注释，实在是有特殊逻辑的情况下，添加简单直接的注释，别说废话，更别说错误的废话</li>
+<li>好好写代码，好好写注释，避免给自己和他人带来苦难</li>
+</ul>
+<h1 id="第5章-格式"><a href="#第5章-格式" class="headerlink" title="第5章 格式"></a>第5章 格式</h1><h2 id="读书笔记-4"><a href="#读书笔记-4" class="headerlink" title="读书笔记"></a>读书笔记</h2><blockquote>
+<p>团队工作代码格式很重要。</p>
+</blockquote>
+<p><strong>垂直格式</strong></p>
+<ul>
+<li>概念间垂直方向上的区隔：在封包声明、导入声明和每个函数之间都有空白行隔开</li>
+<li>垂直方向上的靠近：紧密相关的代码应该相互靠近</li>
+<li>垂直距离<ul>
+<li>变量声明应尽可能靠近其使用位置</li>
+<li>实体变量应该在类的顶部声明</li>
+<li>相关函数：调用者放在被调用者的上面，且相邻</li>
+<li>概念相关的代码应该放到一起</li>
+</ul>
+</li>
+<li>垂直顺序：自上向下展示，像报纸一样，重点突出</li>
+</ul>
+<p><strong>横向格式</strong></p>
+<ul>
+<li>水平方向上的区隔与靠近：用空格</li>
+<li>水平对齐：没有必要</li>
+<li>缩进：不要违反缩进规则</li>
+<li>空范围：避免使用</li>
+</ul>
+<p>团队规则：团队一起说了算，风格统一。</p>
+<h2 id="总结反思-4"><a href="#总结反思-4" class="headerlink" title="总结反思"></a>总结反思</h2><ul>
+<li>“让代码能工作”绝对不是程序员的头等大事，今天写的代码可能过几天就要修改，代码可读性将产生巨大的影响。</li>
+<li>充分利用IDE的格式化工具来保证代码的基本格式。</li>
+</ul>
+<h1 id="第6章-对象与数据结构"><a href="#第6章-对象与数据结构" class="headerlink" title="第6章 对象与数据结构"></a>第6章 对象与数据结构</h1><h2 id="读书笔记-5"><a href="#读书笔记-5" class="headerlink" title="读书笔记"></a>读书笔记</h2><ul>
+<li>private属性：private属性的目的是不想让其他人依赖这些变量，且允许拥有者能自由修改其类型或者实现，但是@Data注解，或者IDEA自动生成set和get让private类型如public一般。我记得当初学习面向对象时，可以在set里面加校验条件，从而限制任意修改属性。</li>
+<li>数据抽象：不暴露数据细节，抽象形态表达数据。</li>
+<li>对象：对象把数据隐藏于抽象之后，暴露操作数据的函数。</li>
+<li>数据结构：数据结构暴露其数据，没有提供有意义的函数。</li>
+<li>Demeter定律：模块不应了解它所操作对象的内部情况。方法不应该调用由任何函数返回的对象的方法。</li>
+<li>DTO：数据传送对象，是一个只有公共变量、没有函数的类。</li>
+</ul>
+<h2 id="总结反思-5"><a href="#总结反思-5" class="headerlink" title="总结反思"></a>总结反思</h2><p>对象和数据结构有区别。</p>
+<h1 id="第7章-错误处理"><a href="#第7章-错误处理" class="headerlink" title="第7章 错误处理"></a>第7章 错误处理</h1><h2 id="读书笔记-6"><a href="#读书笔记-6" class="headerlink" title="读书笔记"></a>读书笔记</h2><ul>
+<li>使用异常而非返回码：Java支持异常，使用异常会使得代码简洁。</li>
+<li>先写Try-Catch-Finally语句：测试驱动开发TDD</li>
+<li>使用不可控异常：可控异常能清晰知道是哪种异常，并做相应的处理，但是违反了开放/闭合原则。</li>
+<li>给出异常发生的环境说明：传递足够的信息给catch块，并记录下来。</li>
+<li>依调用者需要定义异常类：在大多数的异常处理中，不管真实原因如何，我们总做相对标准的处理，记录错误，确保能继续工作。</li>
+<li>别返回null值：返回null值，基本上是在给自己增加工作量，给调用者添乱。如果想返回null值，不如抛出异常，或者返回特例对象。</li>
+<li>别传递null值：随便传入null值可能导致空指针异常，得到运行时错误。</li>
+</ul>
+<h2 id="总结反思-6"><a href="#总结反思-6" class="headerlink" title="总结反思"></a>总结反思</h2><ul>
+<li>对于一切可能的错误，当错误发生时，程序员有责任确保代码照常工作。</li>
+<li>错误处理很重要，但如果他搞乱了代码逻辑，就是错误的做法。</li>
+<li>整洁代码是可读的，但也要强固。可读与强固不冲突。</li>
+</ul>
+<h1 id="第8章-边界"><a href="#第8章-边界" class="headerlink" title="第8章 边界"></a>第8章 边界</h1><h2 id="读书笔记-7"><a href="#读书笔记-7" class="headerlink" title="读书笔记"></a>读书笔记</h2><ul>
+<li>使用第三方程序包或者开源代码时，需要将外来代码干净整洁的整合到自己的代码中，保持软件边界整洁。</li>
+<li>我们没有测试第三方代码的职责，但是我们要为使用的第三方代码编写测试，通过编写测试来看和理解第三方代码（学习型测试）。</li>
+<li>学习型测试免费、确保代码按照我们的需求工作（原作者升级）。</li>
+<li>使用类将调用API隔离起来，在自己的代码中使用隔离的接口，现在我们RPC调用时，在gateway领域中的类，就是完成这项工作。</li>
+<li>利用引用第三方的边界接口的位置来管理边界，避免代码过多的了解第三方代码中的特定信息。</li>
+</ul>
+<h2 id="总结反思-7"><a href="#总结反思-7" class="headerlink" title="总结反思"></a>总结反思</h2><p>依靠自己能控制的东西，好过依靠控制不了的东西，</p>
+<h1 id="第9章-单元测试"><a href="#第9章-单元测试" class="headerlink" title="第9章 单元测试"></a>第9章 单元测试</h1><h2 id="读书笔记-8"><a href="#读书笔记-8" class="headerlink" title="读书笔记"></a>读书笔记</h2><p><strong>TDD测试驱动开发三定律</strong>：</p>
+<ul>
+<li>在编写不能通过的单元测试之前，不可编写生产代码</li>
+<li>编写刚好无法通过的单元测试，不能编译也算不通过</li>
+<li>编写刚好通过当前失败测试的代码</li>
+</ul>
+<p><strong>单元测试</strong>：</p>
+<ul>
+<li>测试代码和生产代码一样，需要保持整洁，不然可能会把问题归咎于测试。</li>
+<li>单元测试使得代码可扩展、可维护、可复用。</li>
+<li>整洁测试：可读性、可读性、可读性。明确，简介和足有有表达力。</li>
+<li>单元测试的3个环节：构造-操作-校验。</li>
+<li>测试和生产环节对性能要求不同，测试代码没必要追求性能。</li>
+<li>每个测试一个断言，每个测试的结果都是一个可快速方便理解的结论，每个测试中断言要尽量少，但至少要一个。</li>
+<li>每个测试一个概念，测试要短小。</li>
+<li>整洁测试的五大原则：快速、独立、可重复、自足验证、及时。</li>
+</ul>
+<p><strong>一个单元测试的例子</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testRecvMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      String msgBody = <span class="string">&quot;&#123;\&quot;changeType\&quot;:\&quot;PAY_STATUS_CHANGE\&quot;,\&quot;channelType\&quot;:\&quot;GUAN_AI_TONG\&quot;,\&quot;entId\&quot;:100549,\&quot;tradeOrderId\&quot;:708652190392121,\&quot;flowId\&quot;:1408251893200719896,\&quot;status\&quot;:1,\&quot;payStatus\&quot;:\&quot;SUCCESS\&quot;&#125;&quot;</span>;</span><br><span class="line">      ConsumeStatus consumeStatus = consumer.recvMessage(msgBody);</span><br><span class="line">      Assert.assertEquals(ConsumeStatus.CONSUME_SUCCESS, consumeStatus);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结反思-8"><a href="#总结反思-8" class="headerlink" title="总结反思"></a>总结反思</h2><p>单元测试是最低成本的测试，如果要上泳道或ST测试再发现问题，问题修复起来会很麻烦，因此要养成写单元测试的习惯，可以尝试TDD方法。</p>
+<h1 id="第10章-类"><a href="#第10章-类" class="headerlink" title="第10章 类"></a>第10章 类</h1><h2 id="读书笔记-9"><a href="#读书笔记-9" class="headerlink" title="读书笔记"></a>读书笔记</h2><p>类的组织：公共静态变量、私有静态变量、私有实体变量、公共变量、公共函数。自顶向下原则。<br>类应该短小：系统应该由许多短小的类而不是少量巨大的类构成。</p>
+<ul>
+<li>单一权责原则（SRP）</li>
+<li>内聚</li>
+</ul>
+<p>为修改而组织：类应该对扩展开放，对修改封闭。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%80%BB%E7%BB%93/" rel="tag"># 总结</a>
+              <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag"># 读书笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/22/%E6%98%A5%E6%8B%9B%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93/" rel="prev" title="我的春招（实习）不完全记录和总结">
+      <i class="fa fa-chevron-left"></i> 我的春招（实习）不完全记录和总结
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC1%E7%AB%A0-%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">第1章 整洁代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="nav-number">1.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D"><span class="nav-number">1.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC2%E7%AB%A0-%E6%9C%89%E6%84%8F%E4%B9%89%E7%9A%84%E5%91%BD%E5%90%8D"><span class="nav-number">2.</span> <span class="nav-text">第2章 有意义的命名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-1"><span class="nav-number">2.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC3%E7%AB%A0-%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">第3章 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-2"><span class="nav-number">3.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-2"><span class="nav-number">3.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC4%E7%AB%A0-%E6%B3%A8%E9%87%8A"><span class="nav-number">4.</span> <span class="nav-text">第4章 注释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-3"><span class="nav-number">4.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-3"><span class="nav-number">4.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC5%E7%AB%A0-%E6%A0%BC%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">第5章 格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-4"><span class="nav-number">5.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-4"><span class="nav-number">5.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC6%E7%AB%A0-%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">6.</span> <span class="nav-text">第6章 对象与数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-5"><span class="nav-number">6.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-5"><span class="nav-number">6.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC7%E7%AB%A0-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">第7章 错误处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-6"><span class="nav-number">7.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-6"><span class="nav-number">7.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC8%E7%AB%A0-%E8%BE%B9%E7%95%8C"><span class="nav-number">8.</span> <span class="nav-text">第8章 边界</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-7"><span class="nav-number">8.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-7"><span class="nav-number">8.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC9%E7%AB%A0-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-number">9.</span> <span class="nav-text">第9章 单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-8"><span class="nav-number">9.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-8"><span class="nav-number">9.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC10%E7%AB%A0-%E7%B1%BB"><span class="nav-number">10.</span> <span class="nav-text">第10章 类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-9"><span class="nav-number">10.1.</span> <span class="nav-text">读书笔记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cido Liu"
+      src="/images/dimo_new.jpg">
+  <p class="site-author-name" itemprop="name">Cido Liu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CidoLiu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CidoLiu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cidoliu@outlook.com" title="E-Mail → mailto:cidoliu@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cido Liu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
