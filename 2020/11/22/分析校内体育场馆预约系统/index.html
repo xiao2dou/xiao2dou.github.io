@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-221954@2x.png">
 <meta property="og:image" content="http://yoursite.com/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-225112@2x.png">
 <meta property="article:published_time" content="2020-11-22T12:55:31.000Z">
-<meta property="article:modified_time" content="2020-11-22T14:57:03.193Z">
+<meta property="article:modified_time" content="2022-04-11T14:10:39.299Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="HTTP">
 <meta property="article:tag" content="网络安全">
@@ -199,10 +199,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-11-22 20:55:31 / Modified: 22:57:03" itemprop="dateCreated datePublished" datetime="2020-11-22T20:55:31+08:00">2020-11-22</time>
+              <time title="Created: 2020-11-22 20:55:31" itemprop="dateCreated datePublished" datetime="2020-11-22T20:55:31+08:00">2020-11-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 22:10:39" itemprop="dateModified" datetime="2022-04-11T22:10:39+08:00">2022-04-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -230,16 +236,16 @@
 <a id="more"></a>
 
 <p>体育场馆预约系统为某APP内的一个内嵌功能，很明显是一个内嵌网页，但不需要单独登陆。</p>
-<h2 id="流量包分析"><a href="#流量包分析" class="headerlink" title="流量包分析"></a>流量包分析</h2><p>首先将手机连接到电脑共享的网络，在手机上进行一次正常的预约操作，使用Wireshark抓取手机产生的流量。</p>
+<h2 id="1-流量包分析"><a href="#1-流量包分析" class="headerlink" title="1. 流量包分析"></a>1. 流量包分析</h2><p>首先将手机连接到电脑共享的网络，在手机上进行一次正常的预约操作，使用Wireshark抓取手机产生的流量。</p>
 <p>下面将从后往前分析预约操作中产生的流量：</p>
-<h3 id="提交预定"><a href="#提交预定" class="headerlink" title="提交预定"></a>提交预定</h3><p>通过过滤HTTP数据包，发现了最终提交预定时，手机向服务器发送了如下图所示的POST请求。</p>
+<h3 id="1-1-提交预定"><a href="#1-1-提交预定" class="headerlink" title="1.1 提交预定"></a>1.1 提交预定</h3><p>通过过滤HTTP数据包，发现了最终提交预定时，手机向服务器发送了如下图所示的POST请求。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-210922@2x.png" alt="图片无法显示"></p>
 <p>通过简单的分析，该请求中的URL中参数id=103表示了某一个具体的场地，Cookie中的JSESSIONID区分了某一个具体的用户，POST的请求中携带的param参数中使用了两个id来表示具体要预约的场地和时间段。</p>
 <p>通过浏览器Set Cookie工具，模拟发送该Post请求，发现Cookie已经过期了，通过简单的调研，知道了JSESSIONID的原理，如下图所示。那接下来的工作就是找到带有SetCookie的HTTP响应和场地的编码方式。</p>
 <p><img src="https://img-blog.csdn.net/20140411173648484?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvY2h1bnFpdXdlaQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="图片无法显示"></p>
-<h3 id="查询可预约的时间和场地信息"><a href="#查询可预约的时间和场地信息" class="headerlink" title="查询可预约的时间和场地信息"></a>查询可预约的时间和场地信息</h3><p>在提交预定之前，手机发送了一个Get请求，通过观察Get请求的URL，很容易看出这是在查询可预约的时间和场地信息。请求如下图所示，URL中携带了s_date和serviceid信息，分别用来表示预约的日期和场地。同样的，这个请求也带有Cookie:JSESSIONID信息。</p>
+<h3 id="1-2-查询可预约的时间和场地信息"><a href="#1-2-查询可预约的时间和场地信息" class="headerlink" title="1.2 查询可预约的时间和场地信息"></a>1.2 查询可预约的时间和场地信息</h3><p>在提交预定之前，手机发送了一个Get请求，通过观察Get请求的URL，很容易看出这是在查询可预约的时间和场地信息。请求如下图所示，URL中携带了s_date和serviceid信息，分别用来表示预约的日期和场地。同样的，这个请求也带有Cookie:JSESSIONID信息。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/1606052275500.jpg" alt="图片无法显示"></p>
-<h3 id="寻找Set-Cookie"><a href="#寻找Set-Cookie" class="headerlink" title="寻找Set-Cookie"></a>寻找Set-Cookie</h3><p>再向上观察，发现了一个可疑的Get请求，该请求直接访问了系统的index.html页面，一般来说，该页面是用来处理用户认证的。通过跟踪该HTTP流，如下图所示，很容易地发现了该Get请求得到了一个HTTP响应，响应包中包含了Set-Cookie:JSESSIONID的信息，并且该信息与上述数据包中的Cookie:JSESSIONID信息一致。</p>
+<h3 id="1-3-寻找Set-Cookie"><a href="#1-3-寻找Set-Cookie" class="headerlink" title="1.3 寻找Set-Cookie"></a>1.3 寻找Set-Cookie</h3><p>再向上观察，发现了一个可疑的Get请求，该请求直接访问了系统的index.html页面，一般来说，该页面是用来处理用户认证的。通过跟踪该HTTP流，如下图所示，很容易地发现了该Get请求得到了一个HTTP响应，响应包中包含了Set-Cookie:JSESSIONID的信息，并且该信息与上述数据包中的Cookie:JSESSIONID信息一致。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-214522@2x.png" alt="图片无法显示"></p>
 <p>该Get请求的URL中携带了userType、code、employeeNo、state和ticket参数：</p>
 <ol>
@@ -249,16 +255,16 @@
 <li>state：猜测用来表示用户或系统状态的，为一个不变量；</li>
 <li>ticket：为单点登陆的一个常用方法，猜测是一个变量。</li>
 </ol>
-<h3 id="寻找code"><a href="#寻找code" class="headerlink" title="寻找code"></a>寻找code</h3><p>通过观察流量，很明显，114结尾的IP地址为预约系统的IP，202结尾的IP地址为主系统的IP。</p>
+<h3 id="1-4-寻找code"><a href="#1-4-寻找code" class="headerlink" title="1.4 寻找code"></a>1.4 寻找code</h3><p>通过观察流量，很明显，114结尾的IP地址为预约系统的IP，202结尾的IP地址为主系统的IP。</p>
 <p>如下图所示，在第一次访问预约系统前，手机发送了一个Get请求，通过域名，猜测是一个获取code的请求。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-215805@2x.png" alt="图片无法显示"></p>
 <p>通过追踪该HTTP流，发现确实返回包中携带了code信息，但是Get请求中携带了personToken等其他信息。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-220426@2x.png" alt="图片无法显示"></p>
-<h3 id="寻找ticket"><a href="#寻找ticket" class="headerlink" title="寻找ticket"></a>寻找ticket</h3><p>发现了一个generateTicket的Get请求，该请求需要personToken参数，返回的数据包中携带了ticket信息。</p>
+<h3 id="1-5-寻找ticket"><a href="#1-5-寻找ticket" class="headerlink" title="1.5 寻找ticket"></a>1.5 寻找ticket</h3><p>发现了一个generateTicket的Get请求，该请求需要personToken参数，返回的数据包中携带了ticket信息。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-221954@2x.png" alt="图片无法显示"></p>
-<h3 id="寻找personToken"><a href="#寻找personToken" class="headerlink" title="寻找personToken"></a>寻找personToken</h3><p>在本次预定过程中，并没有看到服务器返回personToken的相关信息，猜测可能是在APP登陆时产生的personToken。退出APP的登陆状态，重新登陆抓包，发现了登陆APP时服务器返回了personToken和其他一些后续可能需要使用的字段。</p>
+<h3 id="1-6-寻找personToken"><a href="#1-6-寻找personToken" class="headerlink" title="1.6 寻找personToken"></a>1.6 寻找personToken</h3><p>在本次预定过程中，并没有看到服务器返回personToken的相关信息，猜测可能是在APP登陆时产生的personToken。退出APP的登陆状态，重新登陆抓包，发现了登陆APP时服务器返回了personToken和其他一些后续可能需要使用的字段。</p>
 <p>至此，流量分析部分已经完成。</p>
-<h2 id="使用Python模拟预约"><a href="#使用Python模拟预约" class="headerlink" title="使用Python模拟预约"></a>使用Python模拟预约</h2><p>主要分为以下过程：</p>
+<h2 id="2-使用Python模拟预约"><a href="#2-使用Python模拟预约" class="headerlink" title="2. 使用Python模拟预约"></a>2. 使用Python模拟预约</h2><p>主要分为以下过程：</p>
 <ol>
 <li>登陆系统，得到personToken、memberId等信息；</li>
 <li>请求生成ticket；</li>
@@ -275,10 +281,10 @@
 <li>预定成功后，发送邮件通知。</li>
 </ol>
 <p>具体代码暂不开源。</p>
-<h2 id="一个发现"><a href="#一个发现" class="headerlink" title="一个发现"></a>一个发现</h2><p>在测试中，切换用户测试时，忘记修改学号，只修改了用户名和密码，但仍然预定成功了，并且是给当前学号预定。发现该系统登陆后可以给任何学号预约，因此系统的安全认证存在问题，并且看起来这个系统还是复用了某个商业订单系统，如下图所示，登陆页面显示为商户。</p>
+<h2 id="3-一个发现"><a href="#3-一个发现" class="headerlink" title="3. 一个发现"></a>3. 一个发现</h2><p>在测试中，切换用户测试时，忘记修改学号，只修改了用户名和密码，但仍然预定成功了，并且是给当前学号预定。发现该系统登陆后可以给任何学号预约，因此系统的安全认证存在问题，并且看起来这个系统还是复用了某个商业订单系统，如下图所示，登陆页面显示为商户。</p>
 <p>并且存在某些场馆是需要付费的，并且校园卡的付费系统在金额小于30元时不需要提供支付密码，因此存在着金融安全隐患。</p>
 <p><img src="/2020/11/22/%E5%88%86%E6%9E%90%E6%A0%A1%E5%86%85%E4%BD%93%E8%82%B2%E5%9C%BA%E9%A6%86%E9%A2%84%E7%BA%A6%E7%B3%BB%E7%BB%9F/WX20201122-225112@2x.png" alt="图片无法显示"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>面对一个陌生的系统分析，过程比上述写出来的总结要复杂，比如直接访问预约系统的网页，他跳转到了一个误导性的登陆页面，但尝试多次也无法登陆；预约系统分为/和/web/两个子系统，前者看起来是一个网页版，但实际上无法正常使用，能够正常使用的是/web/的移动端。某些HTTP请求头中的信息如Cookie是可以省略的，而某些不可以。等等许多问题需要在实验中发现，这个工具从开始到实现，大概花了2个半天的时间。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>面对一个陌生的系统分析，过程比上述写出来的总结要复杂，比如直接访问预约系统的网页，他跳转到了一个误导性的登陆页面，但尝试多次也无法登陆；预约系统分为/和/web/两个子系统，前者看起来是一个网页版，但实际上无法正常使用，能够正常使用的是/web/的移动端。某些HTTP请求头中的信息如Cookie是可以省略的，而某些不可以。等等许多问题需要在实验中发现，这个工具从开始到实现，大概花了2个半天的时间。</p>
 <p>这算是我第一次动手深入分析一个Web系统，系统采用的是HTTP协议而不是HTTPS协议，这给分析带来了巨大的方便，在这过程中也更加深入地了解到了Web系统，特别是用户认证功能。</p>
 <p>感谢合作者qj大佬，在这个过程中学到了很多。</p>
 
@@ -366,7 +372,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E5%8C%85%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">流量包分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E9%A2%84%E5%AE%9A"><span class="nav-number">1.1.</span> <span class="nav-text">提交预定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E5%8F%AF%E9%A2%84%E7%BA%A6%E7%9A%84%E6%97%B6%E9%97%B4%E5%92%8C%E5%9C%BA%E5%9C%B0%E4%BF%A1%E6%81%AF"><span class="nav-number">1.2.</span> <span class="nav-text">查询可预约的时间和场地信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BESet-Cookie"><span class="nav-number">1.3.</span> <span class="nav-text">寻找Set-Cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEcode"><span class="nav-number">1.4.</span> <span class="nav-text">寻找code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEticket"><span class="nav-number">1.5.</span> <span class="nav-text">寻找ticket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEpersonToken"><span class="nav-number">1.6.</span> <span class="nav-text">寻找personToken</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Python%E6%A8%A1%E6%8B%9F%E9%A2%84%E7%BA%A6"><span class="nav-number">2.</span> <span class="nav-text">使用Python模拟预约</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%8F%91%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">一个发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%B5%81%E9%87%8F%E5%8C%85%E5%88%86%E6%9E%90"><span class="nav-text">1. 流量包分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%8F%90%E4%BA%A4%E9%A2%84%E5%AE%9A"><span class="nav-text">1.1 提交预定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%9F%A5%E8%AF%A2%E5%8F%AF%E9%A2%84%E7%BA%A6%E7%9A%84%E6%97%B6%E9%97%B4%E5%92%8C%E5%9C%BA%E5%9C%B0%E4%BF%A1%E6%81%AF"><span class="nav-text">1.2 查询可预约的时间和场地信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%AF%BB%E6%89%BESet-Cookie"><span class="nav-text">1.3 寻找Set-Cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%AF%BB%E6%89%BEcode"><span class="nav-text">1.4 寻找code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E5%AF%BB%E6%89%BEticket"><span class="nav-text">1.5 寻找ticket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E5%AF%BB%E6%89%BEpersonToken"><span class="nav-text">1.6 寻找personToken</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8Python%E6%A8%A1%E6%8B%9F%E9%A2%84%E7%BA%A6"><span class="nav-text">2. 使用Python模拟预约</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%80%E4%B8%AA%E5%8F%91%E7%8E%B0"><span class="nav-text">3. 一个发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-text">4. 总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -382,7 +388,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -395,7 +401,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -430,7 +436,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

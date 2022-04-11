@@ -28,7 +28,7 @@
 <meta property="og:description" content="Motivation：本来把一些项目代码放在Github的私有仓库上，邀请项目参与同学协作。但是有些项目放到Github上不符合规定，尽管是私有仓库。因此考虑在服务器上搭建Git服务，通过自己的服务器同步代码，项目成员协作参与。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2020-12-01T08:43:01.000Z">
-<meta property="article:modified_time" content="2020-12-12T11:31:09.000Z">
+<meta property="article:modified_time" content="2022-04-11T13:59:36.749Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="开发环境">
 <meta property="article:tag" content="Git">
@@ -197,7 +197,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-12-12 19:31:09" itemprop="dateModified" datetime="2020-12-12T19:31:09+08:00">2020-12-12</time>
+                <time title="Modified: 2022-04-11 21:59:36" itemprop="dateModified" datetime="2022-04-11T21:59:36+08:00">2022-04-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,23 +220,28 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><strong>Motivation</strong>：本来把一些项目代码放在Github的私有仓库上，邀请项目参与同学协作。但是有些项目放到Github上不符合规定，尽管是私有仓库。因此考虑在服务器上搭建Git服务，通过自己的服务器同步代码，项目成员协作参与。 </p>
+        <p><strong>Motivation</strong>：本来把一些项目代码放在Github的私有仓库上，邀请项目参与同学协作。但是有些项目放到Github上不符合规定，尽管是私有仓库。因此考虑在服务器上搭建Git服务，通过自己的服务器同步代码，项目成员协作参与。</p>
 <a id="more"></a>
 
 <p><strong>服务器操作系统为 Ubuntu 18.X</strong></p>
-<h2 id="安装Git服务"><a href="#安装Git服务" class="headerlink" title="安装Git服务"></a>安装Git服务</h2><p>在Ubuntu上，轻松使用以下命令安装Git服务。    </p>
-<p><code>$ sudo apt-get install git </code></p>
-<h2 id="创建Git用户"><a href="#创建Git用户" class="headerlink" title="创建Git用户"></a>创建Git用户</h2><p>使用以下命令来创建一个专门的 git 管理用户。    </p>
+<h2 id="1-安装Git服务"><a href="#1-安装Git服务" class="headerlink" title="1. 安装Git服务"></a>1. 安装Git服务</h2><p>在Ubuntu上，轻松使用以下命令安装Git服务。</p>
+<p><code>sudo apt-get install git</code></p>
+<h2 id="2-创建Git用户"><a href="#2-创建Git用户" class="headerlink" title="2. 创建Git用户"></a>2. 创建Git用户</h2><p>使用以下命令来创建一个专门的 git 管理用户。</p>
 <p><code>sudo adduser git</code></p>
-<h2 id="添加ssh公钥"><a href="#添加ssh公钥" class="headerlink" title="添加ssh公钥"></a>添加ssh公钥</h2><ol>
-<li>Windows用户在<code>C:\Users\XXX\.ssh</code>目录下可以看到系统的.ssh公钥id_rsa.pub。</li>
-<li>Linux用户使用 ssh-keygen -t rsa -C “<a href="mailto:&#x78;&#x78;&#x78;&#x78;&#x78;&#64;&#120;&#x78;&#x78;&#x78;&#x78;&#x2e;&#x63;&#x6f;&#x6d;">&#x78;&#x78;&#x78;&#x78;&#x78;&#64;&#120;&#x78;&#x78;&#x78;&#x78;&#x2e;&#x63;&#x6f;&#x6d;</a>“生成密钥，密钥在<code>~/.ssh/id_rsa.pub</code>文件中。</li>
-<li>将公钥导入到<code>/home/git/.ssh/authorized_keys</code>文件里，一行一个。</li>
-<li>若没有.ssh文件夹，表示该用户还没有使用过ssh服务，使用命令<code>$ ssh localhost</code>登陆本机，并输入密码，自动生成.ssh文件夹。</li>
-<li>在.ssh文件夹下，使用命令<code>vim authorized_keys</code>添加公钥。 </li>
+<h2 id="3-添加ssh公钥"><a href="#3-添加ssh公钥" class="headerlink" title="3. 添加ssh公钥"></a>3. 添加ssh公钥</h2><ol>
+<li><p>Windows用户在<code>C:\Users\XXX\.ssh</code>目录下可以看到系统的.ssh公钥id_rsa.pub。</p>
+</li>
+<li><p>Linux用户使用 ssh-keygen -t rsa -C “<a href="mailto:&#x78;&#120;&#x78;&#120;&#120;&#x40;&#120;&#120;&#x78;&#x78;&#x78;&#46;&#x63;&#111;&#x6d;">&#x78;&#120;&#x78;&#120;&#120;&#x40;&#120;&#120;&#x78;&#x78;&#x78;&#46;&#x63;&#111;&#x6d;</a>“生成密钥，密钥在<code>~/.ssh/id_rsa.pub</code>文件中。</p>
+</li>
+<li><p>将公钥导入到<code>/home/git/.ssh/authorized_keys</code>文件里，一行一个。</p>
+</li>
+<li><p>若没有.ssh文件夹，表示该用户还没有使用过ssh服务，使用命令<code>$ ssh localhost</code>登陆本机，并输入密码，自动生成.ssh文件夹。</p>
+</li>
+<li><p>在.ssh文件夹下，使用命令<code>vim authorized_keys</code>添加公钥。</p>
+<p> <em>也可不添加公钥，每次使用git用户的密码进行clone、push和pull操作</em></p>
+</li>
 </ol>
-<p><em>也可不添加公钥，每次使用git用户的密码进行clone、push和pull操作</em></p>
-<h2 id="在服务器新建空远程仓库"><a href="#在服务器新建空远程仓库" class="headerlink" title="在服务器新建空远程仓库"></a>在服务器新建空远程仓库</h2><p>就像我们在Github上新建仓库一样，我们首先需要在自己的Git服务器上建立远程仓库。</p>
+<h2 id="4-在服务器新建空远程仓库"><a href="#4-在服务器新建空远程仓库" class="headerlink" title="4. 在服务器新建空远程仓库"></a>4. 在服务器新建空远程仓库</h2><p>就像我们在Github上新建仓库一样，我们首先需要在自己的Git服务器上建立远程仓库。</p>
 <p>不过建议首先建立一个文件夹，便于归属权管理，此文件夹等同于Github的用户名。</p>
 <p><code>$ mkdir folder_name</code></p>
 <p><code>$ git --bare init repository_name.git</code></p>
@@ -245,9 +250,9 @@
 <li>使用 –bare 参数表示这是一个公共仓库，而非私人仓库，详细参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/irockcode/p/8761954.html">git init 与 git init –bare 区别</a>，使用 <code>git init</code>会导致后续push代码出现错误，无法成功push。</li>
 <li>确保建立的仓库的所有权为git用户，即在git用户下创建仓库，否则导致push时权限不够的问题。</li>
 </ol>
-<h2 id="绑定本地仓库到远程仓库"><a href="#绑定本地仓库到远程仓库" class="headerlink" title="绑定本地仓库到远程仓库"></a>绑定本地仓库到远程仓库</h2><p>在本地使用以下命令，将本地仓库绑定到远程仓库，其中<code>XX.XX.XX.XX</code>为git服务器的IP或者域名。</p>
+<h2 id="5-绑定本地仓库到远程仓库"><a href="#5-绑定本地仓库到远程仓库" class="headerlink" title="5. 绑定本地仓库到远程仓库"></a>5. 绑定本地仓库到远程仓库</h2><p>在本地使用以下命令，将本地仓库绑定到远程仓库，其中<code>XX.XX.XX.XX</code>为git服务器的IP或者域名。</p>
 <p><code>$ git remote add origin git@XX.XX.XX.XX:folder_name/repository_name.git</code></p>
-<h2 id="PUSH代码"><a href="#PUSH代码" class="headerlink" title="PUSH代码"></a>PUSH代码</h2><p>添加远程仓库后就可以像Github那样进行push，pull，commit操作了。</p>
+<h2 id="6-PUSH代码"><a href="#6-PUSH代码" class="headerlink" title="6. PUSH代码"></a>6. PUSH代码</h2><p>添加远程仓库后就可以像Github那样进行push，pull，commit操作了。</p>
 <p><code>$ git push --set-upstream origin master</code></p>
 
     </div>
@@ -333,7 +338,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Git%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.</span> <span class="nav-text">安装Git服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAGit%E7%94%A8%E6%88%B7"><span class="nav-number">2.</span> <span class="nav-text">创建Git用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0ssh%E5%85%AC%E9%92%A5"><span class="nav-number">3.</span> <span class="nav-text">添加ssh公钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%96%B0%E5%BB%BA%E7%A9%BA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">4.</span> <span class="nav-text">在服务器新建空远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">5.</span> <span class="nav-text">绑定本地仓库到远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PUSH%E4%BB%A3%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">PUSH代码</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85Git%E6%9C%8D%E5%8A%A1"><span class="nav-text">1. 安装Git服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%9B%E5%BB%BAGit%E7%94%A8%E6%88%B7"><span class="nav-text">2. 创建Git用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%B7%BB%E5%8A%A0ssh%E5%85%AC%E9%92%A5"><span class="nav-text">3. 添加ssh公钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%96%B0%E5%BB%BA%E7%A9%BA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-text">4. 在服务器新建空远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%BB%91%E5%AE%9A%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-text">5. 绑定本地仓库到远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-PUSH%E4%BB%A3%E7%A0%81"><span class="nav-text">6. PUSH代码</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -349,7 +354,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -362,7 +367,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -397,7 +402,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

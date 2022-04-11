@@ -28,7 +28,7 @@
 <meta property="og:description" content="看到一个说法，低级程序员的代码只有机器能看懂，中级程序员的代码人能看懂，高级程序员用业务语言写代码，也就是所说的DDD领域驱动设计。《Clean Code》这本书前后读了2次，第一次读没有太大的感受，常规的建议平时也都用上了，不少建议也感觉用不上；第二次是在实习中读的，公司的项目复杂，且团队合作开发，我需要维护别人的代码，别人也需要维护我的代码，每次PR之前也都需要请同学Review，若代码不够整">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-08-18T12:47:58.000Z">
-<meta property="article:modified_time" content="2021-08-18T13:35:03.636Z">
+<meta property="article:modified_time" content="2022-04-11T14:14:35.553Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="总结">
 <meta property="article:tag" content="读书笔记">
@@ -189,10 +189,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-08-18 20:47:58 / Modified: 21:35:03" itemprop="dateCreated datePublished" datetime="2021-08-18T20:47:58+08:00">2021-08-18</time>
+              <time title="Created: 2021-08-18 20:47:58" itemprop="dateCreated datePublished" datetime="2021-08-18T20:47:58+08:00">2021-08-18</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 22:14:35" itemprop="dateModified" datetime="2022-04-11T22:14:35+08:00">2022-04-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -240,7 +246,7 @@
 <li>遵循设计模式、框架：设计模式和框架是工业界实践经验的总结，其中包含了很多Clean Code的准则，遵循它们能使得自己的代码更Clean。</li>
 </ul>
 <blockquote>
-<p>“无忌，我教你的还记得多少？”<br>“回太师傅，我只记得一大半”<br>“ 那，现在呢？”<br>“已经剩下一小半了”<br>“那，现在呢？”<br>“我已经把所有的全忘记了！”<br>“好，你可以上了…” </p>
+<p>“无忌，我教你的还记得多少？”<br>“回太师傅，我只记得一大半”<br>“ 那，现在呢？”<br>“已经剩下一小半了”<br>“那，现在呢？”<br>“我已经把所有的全忘记了！”<br>“好，你可以上了…”</p>
 </blockquote>
 <p>《Clean Code》中包含了大量的Clean小技巧，无需死记硬背这些技巧，努力培养自己的“代码感”，在不知不觉中实践《Clean Code》中的技巧。</p>
 <h1 id="第2章-有意义的命名"><a href="#第2章-有意义的命名" class="headerlink" title="第2章 有意义的命名"></a>第2章 有意义的命名</h1><h2 id="读书笔记-1"><a href="#读书笔记-1" class="headerlink" title="读书笔记"></a>读书笔记</h2><p>开发过程中命名随处可见，<strong>取个好名字的几条简单规则</strong>：</p>
@@ -295,9 +301,11 @@
 <li>结构化编程：Edsger Dijkstra的结构化编程规则：每个函数、函数中的每个代码块都应该有一个入口、一个出口。意味着在每个函数中只该有一个return语句，循环中不能有break或continue语句，永远不能有任何goto语句。对于小函数，这些规则帮助不大；在大函数中，这些规则才有明显的好处。因此只要保持函数短小，偶尔出现的return、break、continue语句没有坏处。</li>
 </ul>
 <p><strong>如何写出这样的好函数</strong>：重构！重构！重构！</p>
-<pre><code>1. 一开始函数冗长而复杂。
-2. 打磨代码，分解函数、修改名称、消除重复。
-3. 组装函数。</code></pre>
+<ol>
+<li>一开始函数冗长而复杂。</li>
+<li>打磨代码，分解函数、修改名称、消除重复。</li>
+<li>组装函数。</li>
+</ol>
 <h2 id="总结反思-2"><a href="#总结反思-2" class="headerlink" title="总结反思"></a>总结反思</h2><ul>
 <li>多个无逻辑关系的参数、冗长的函数、不清晰的函数名、多个return语句等函数风格是一场灾难，这将给程序可读性带来巨大的困难。</li>
 <li>很难一次性写出满足上述规则的函数，但可以在完成程序功能后，通过重构代码，来增强程序都可读性。</li>
@@ -518,7 +526,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC1%E7%AB%A0-%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">第1章 整洁代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="nav-number">1.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D"><span class="nav-number">1.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC2%E7%AB%A0-%E6%9C%89%E6%84%8F%E4%B9%89%E7%9A%84%E5%91%BD%E5%90%8D"><span class="nav-number">2.</span> <span class="nav-text">第2章 有意义的命名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-1"><span class="nav-number">2.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC3%E7%AB%A0-%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">第3章 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-2"><span class="nav-number">3.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-2"><span class="nav-number">3.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC4%E7%AB%A0-%E6%B3%A8%E9%87%8A"><span class="nav-number">4.</span> <span class="nav-text">第4章 注释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-3"><span class="nav-number">4.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-3"><span class="nav-number">4.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC5%E7%AB%A0-%E6%A0%BC%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">第5章 格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-4"><span class="nav-number">5.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-4"><span class="nav-number">5.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC6%E7%AB%A0-%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">6.</span> <span class="nav-text">第6章 对象与数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-5"><span class="nav-number">6.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-5"><span class="nav-number">6.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC7%E7%AB%A0-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">第7章 错误处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-6"><span class="nav-number">7.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-6"><span class="nav-number">7.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC8%E7%AB%A0-%E8%BE%B9%E7%95%8C"><span class="nav-number">8.</span> <span class="nav-text">第8章 边界</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-7"><span class="nav-number">8.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-7"><span class="nav-number">8.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC9%E7%AB%A0-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-number">9.</span> <span class="nav-text">第9章 单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-8"><span class="nav-number">9.1.</span> <span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-8"><span class="nav-number">9.2.</span> <span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC10%E7%AB%A0-%E7%B1%BB"><span class="nav-number">10.</span> <span class="nav-text">第10章 类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-9"><span class="nav-number">10.1.</span> <span class="nav-text">读书笔记</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC1%E7%AB%A0-%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81"><span class="nav-text">第1章 整洁代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC2%E7%AB%A0-%E6%9C%89%E6%84%8F%E4%B9%89%E7%9A%84%E5%91%BD%E5%90%8D"><span class="nav-text">第2章 有意义的命名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-1"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-1"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC3%E7%AB%A0-%E5%87%BD%E6%95%B0"><span class="nav-text">第3章 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-2"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-2"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC4%E7%AB%A0-%E6%B3%A8%E9%87%8A"><span class="nav-text">第4章 注释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-3"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-3"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC5%E7%AB%A0-%E6%A0%BC%E5%BC%8F"><span class="nav-text">第5章 格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-4"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-4"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC6%E7%AB%A0-%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-text">第6章 对象与数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-5"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-5"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC7%E7%AB%A0-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-text">第7章 错误处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-6"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-6"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC8%E7%AB%A0-%E8%BE%B9%E7%95%8C"><span class="nav-text">第8章 边界</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-7"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-7"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC9%E7%AB%A0-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-text">第9章 单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-8"><span class="nav-text">读书笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D-8"><span class="nav-text">总结反思</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC10%E7%AB%A0-%E7%B1%BB"><span class="nav-text">第10章 类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-9"><span class="nav-text">读书笔记</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -534,7 +542,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -547,7 +555,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -582,7 +590,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/11/24/DNS-DNS-DNS-Based-De-NAT-Scheme/index.png">
 <meta property="og:image" content="https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig7_HTML.gif">
 <meta property="article:published_time" content="2020-11-24T01:46:04.000Z">
-<meta property="article:modified_time" content="2020-12-12T07:30:50.000Z">
+<meta property="article:modified_time" content="2022-04-11T13:49:18.529Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="文献阅读">
 <meta property="article:tag" content="DNS">
@@ -207,7 +207,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-12-12 15:30:50" itemprop="dateModified" datetime="2020-12-12T15:30:50+08:00">2020-12-12</time>
+                <time title="Modified: 2022-04-11 21:49:18" itemprop="dateModified" datetime="2022-04-11T21:49:18+08:00">2022-04-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -236,11 +236,11 @@
 <p>该论文提出的De-NAT方法具有较大的局限性，文章中描述的“drum beats”似乎并没有通过实验验证，只是作者发现了这一现象。</p>
 <a id="more"></a>
 
-<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>Network Address Translation (NAT) routers aggregate the flows of multiple devices behind a single IP address. By doing so, NAT routers masquerade the original IP address, which is often viewed as a privacy feature, making it harder to identify the communication of individuals devices behind the NAT. De-NAT is the reverse process: re-identifying communication flowing into and out of the NAT. De-NAT can be used for traffic management, security, and lawful surveillance.</p>
+<h2 id="1-Abstract"><a href="#1-Abstract" class="headerlink" title="1. Abstract"></a>1. Abstract</h2><p>Network Address Translation (NAT) routers aggregate the flows of multiple devices behind a single IP address. By doing so, NAT routers masquerade the original IP address, which is often viewed as a privacy feature, making it harder to identify the communication of individuals devices behind the NAT. De-NAT is the reverse process: re-identifying communication flowing into and out of the NAT. De-NAT can be used for traffic management, security, and lawful surveillance.</p>
 <p>网络地址转换(NAT)路由器将多个设备的流量汇总到一个IP地址后面。这样可以使用NAT路由器对原始IP地址进行伪装，这通常被视为一种隐私功能，使其更难识别NAT背后的个人设备的通信。De-NAT是相反的过程：重新识别流入和流出NAT的通信。De-NAT可用于流量管理、安全和合法监控。</p>
 <p>We show how DNS requests provide an effective De-NAT mechanism by observing queries to open resolver, in addition to ‘classical’ provider-based De-NAT. This new method allows de-NATing in cases where known schemes fail, e.g., in Windows 8 and 10, and by remote DNS resolvers. We analyze use cases where the suggested DNS based De-NAT is effective, suggest a De-NAT algorithm and evaluate its performance on real (anonymized) traffic. Another contribution is identifying the phenomena of drum beats, which are periodic DNS requests by popular applications and processes; these can allow long-term de-NATing, and also provide fingerprinting identifying specific devices and users. We conclude with recommendations for mitigating de-NATing.</p>
 <p>我们展示了除了基于”经典”De-NAT之外，提出了一种DNS请求如何通过观察对开放解析器的查询来提供有效的De-NAT机制。这种新方法允许在已知方案失败的情况下进行De-NAT，例如，在Windows 8和10中，以及通过远程DNS解析器进行。我们分析了基于DNS的De-NAT有效的使用案例，提出了一种De-NAT算法，并评估了它在真实（匿名）流量上的性能。另一个贡献是识别了‘drum beats’鼓点现象，这是流行的应用程序和进程的周期性DNS请求；这些可以允许长期的去NAT化，还提供了识别特定设备和用户的指纹。最后，我们提出了缓解去NATing的建议。</p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>下图展示了一个使用NAT的家庭网络拓扑结构，路由器通过维护一张(IP,port)映射表实现端口转发功能，从而扩展出更多的局域网IP地址，用于共享同一个IP。</p>
+<h2 id="2-Introduction"><a href="#2-Introduction" class="headerlink" title="2. Introduction"></a>2. Introduction</h2><p>下图展示了一个使用NAT的家庭网络拓扑结构，路由器通过维护一张(IP,port)映射表实现端口转发功能，从而扩展出更多的局域网IP地址，用于共享同一个IP。</p>
 <p><img src="https://media.springernature.com/original/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig1_HTML.gif" alt="图片"></p>
 <p>De-NAT定义：To identity the specific device or user sending a particular packet。识别出NAT后面的单个设备以及每个设备所产生的数据包。</p>
 <p>De-NAT的motivation：</p>
@@ -283,7 +283,7 @@
 <td>ISP or Open resolver</td>
 </tr>
 </tbody></table>
-<h2 id="DNS请求中的IP-ID"><a href="#DNS请求中的IP-ID" class="headerlink" title="DNS请求中的IP-ID"></a>DNS请求中的IP-ID</h2><p>下图展示了3种操作系统的DNS请求包中的IP-ID递增现象：</p>
+<h2 id="3-DNS请求中的IP-ID"><a href="#3-DNS请求中的IP-ID" class="headerlink" title="3. DNS请求中的IP-ID"></a>3. DNS请求中的IP-ID</h2><p>下图展示了3种操作系统的DNS请求包中的IP-ID递增现象：</p>
 <p><img src="https://media.springernature.com/original/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig2_HTML.gif" alt="图片"></p>
 <p>但是这样的递增规律可能由于数据包传输或抓包中的丢包、乱序、重传而产生一定的抖动，如下图所示，抖动在一定范围内：</p>
 <p><img src="https://media.springernature.com/original/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig3_HTML.gif" alt="图片"></p>
@@ -293,19 +293,19 @@
 <li>删除（置空）或修改了IP-ID；</li>
 <li>手动配置了OpenDNS，这种情况下ISP无法收到到DNS请求数据包。</li>
 </ol>
-<h2 id="De-NATing-DNS-请求的算法"><a href="#De-NATing-DNS-请求的算法" class="headerlink" title="De-NATing DNS 请求的算法"></a>De-NATing DNS 请求的算法</h2><p>下图(a)展示了3台设备（限Win8/10和某些Android）的DNS请求包的IP-ID随时间的变化规律，其中存在A和B两个碰撞collision点；图(b)展示了一种具有时间空隙的情况，后续在算法中将处理这种情况。</p>
+<h2 id="4-De-NATing-DNS-请求的算法"><a href="#4-De-NATing-DNS-请求的算法" class="headerlink" title="4. De-NATing DNS 请求的算法"></a>4. De-NATing DNS 请求的算法</h2><p>下图(a)展示了3台设备（限Win8/10和某些Android）的DNS请求包的IP-ID随时间的变化规律，其中存在A和B两个碰撞collision点；图(b)展示了一种具有时间空隙的情况，后续在算法中将处理这种情况。</p>
 <p><img src="https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig4_HTML.gif" alt="图片"></p>
 <p>作者提出的算法首先将IP-ID按照时间递增进行聚类，如下图(a)所示，一共聚得了A,B,C,D,E,F,G,H,I 9个类，其中A和B为碰撞点；再通过合并算法（考虑时间差、IP-ID差和斜率），得到合并结果如下图(b)所示。</p>
 <p><img src="https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig5_HTML.gif" alt="图片"></p>
 <p>具体算法详见原文。</p>
-<h2 id="算法测试"><a href="#算法测试" class="headerlink" title="算法测试"></a>算法测试</h2><p>下图(a)是作者在有20台Win8和Win10设备的NAT抓取的流量分析的结果，经过聚类后得到155个clusters，再经过合并后得到37个merged-clusters。</p>
+<h2 id="5-算法测试"><a href="#5-算法测试" class="headerlink" title="5. 算法测试"></a>5. 算法测试</h2><p>下图(a)是作者在有20台Win8和Win10设备的NAT抓取的流量分析的结果，经过聚类后得到155个clusters，再经过合并后得到37个merged-clusters。</p>
 <p><img src="https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig6_HTML.gif" alt="图片"></p>
 <p>按照作者提出了两个指标，The Total Coverage ratio was 0.977, and the Total Accuracy was 0.996 (several merged-clusters weren’t assigned to any device, so this number is higher).</p>
-<h2 id="长期De-NATing"><a href="#长期De-NATing" class="headerlink" title="长期De-NATing"></a>长期De-NATing</h2><p>作者提出了‘drum beats’鼓点现象用来描述某一特定的设备，用于长期De-NATing以应对设备重启等情况。‘drum beats’鼓点现象是指受操作系统、硬件驱动、服务应用的影响，因为DNS的结果具有一定的存活时间，到期后需要更新，机器会定期的请求解析某些域名，如下表所示：</p>
+<h2 id="6-长期De-NATing"><a href="#6-长期De-NATing" class="headerlink" title="6. 长期De-NATing"></a>6. 长期De-NATing</h2><p>作者提出了‘drum beats’鼓点现象用来描述某一特定的设备，用于长期De-NATing以应对设备重启等情况。‘drum beats’鼓点现象是指受操作系统、硬件驱动、服务应用的影响，因为DNS的结果具有一定的存活时间，到期后需要更新，机器会定期的请求解析某些域名，如下表所示：</p>
 <p><img src="/2020/11/24/DNS-DNS-DNS-Based-De-NAT-Scheme/index.png" alt="图片"></p>
-<h2 id="全数据De-NATing，将TCP数据包和DNS关联"><a href="#全数据De-NATing，将TCP数据包和DNS关联" class="headerlink" title="全数据De-NATing，将TCP数据包和DNS关联"></a>全数据De-NATing，将TCP数据包和DNS关联</h2><p>在分析了同一机器TCP数据包和DNS数据包的时间关系后，本文直接将TCP数据包与向前最相邻的数据包直接关联，如下图所示。</p>
+<h2 id="7-全数据De-NATing，将TCP数据包和DNS关联"><a href="#7-全数据De-NATing，将TCP数据包和DNS关联" class="headerlink" title="7. 全数据De-NATing，将TCP数据包和DNS关联"></a>7. 全数据De-NATing，将TCP数据包和DNS关联</h2><p>在分析了同一机器TCP数据包和DNS数据包的时间关系后，本文直接将TCP数据包与向前最相邻的数据包直接关联，如下图所示。</p>
 <p><img src="https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-030-00434-7_4/MediaObjects/473459_1_En_4_Fig7_HTML.gif" alt="图片"></p>
-<h2 id="反De-NATing的建议"><a href="#反De-NATing的建议" class="headerlink" title="反De-NATing的建议"></a>反De-NATing的建议</h2><p>作者也提出了如下几条反De-NATing的建议，用以保护用户的隐私：</p>
+<h2 id="8-反De-NATing的建议"><a href="#8-反De-NATing的建议" class="headerlink" title="8. 反De-NATing的建议"></a>8. 反De-NATing的建议</h2><p>作者也提出了如下几条反De-NATing的建议，用以保护用户的隐私：</p>
 <ol>
 <li>路由器修改DNS数据包的IP-ID；</li>
 <li>在路由器上运行DNS代理；</li>
@@ -396,7 +396,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS%E8%AF%B7%E6%B1%82%E4%B8%AD%E7%9A%84IP-ID"><span class="nav-number">3.</span> <span class="nav-text">DNS请求中的IP-ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#De-NATing-DNS-%E8%AF%B7%E6%B1%82%E7%9A%84%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">De-NATing DNS 请求的算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">算法测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%BF%E6%9C%9FDe-NATing"><span class="nav-number">6.</span> <span class="nav-text">长期De-NATing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E6%95%B0%E6%8D%AEDe-NATing%EF%BC%8C%E5%B0%86TCP%E6%95%B0%E6%8D%AE%E5%8C%85%E5%92%8CDNS%E5%85%B3%E8%81%94"><span class="nav-number">7.</span> <span class="nav-text">全数据De-NATing，将TCP数据包和DNS关联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8DDe-NATing%E7%9A%84%E5%BB%BA%E8%AE%AE"><span class="nav-number">8.</span> <span class="nav-text">反De-NATing的建议</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Abstract"><span class="nav-text">1. Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Introduction"><span class="nav-text">2. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-DNS%E8%AF%B7%E6%B1%82%E4%B8%AD%E7%9A%84IP-ID"><span class="nav-text">3. DNS请求中的IP-ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-De-NATing-DNS-%E8%AF%B7%E6%B1%82%E7%9A%84%E7%AE%97%E6%B3%95"><span class="nav-text">4. De-NATing DNS 请求的算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%AE%97%E6%B3%95%E6%B5%8B%E8%AF%95"><span class="nav-text">5. 算法测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%95%BF%E6%9C%9FDe-NATing"><span class="nav-text">6. 长期De-NATing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%85%A8%E6%95%B0%E6%8D%AEDe-NATing%EF%BC%8C%E5%B0%86TCP%E6%95%B0%E6%8D%AE%E5%8C%85%E5%92%8CDNS%E5%85%B3%E8%81%94"><span class="nav-text">7. 全数据De-NATing，将TCP数据包和DNS关联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%8F%8DDe-NATing%E7%9A%84%E5%BB%BA%E8%AE%AE"><span class="nav-text">8. 反De-NATing的建议</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -412,7 +412,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -425,7 +425,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -460,7 +460,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

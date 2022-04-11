@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/%E9%98%BF%E9%87%8C%E4%BA%91.png">
 <meta property="og:image" content="http://yoursite.com/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF.PNG?100x">
 <meta property="article:published_time" content="2020-08-18T07:06:11.000Z">
-<meta property="article:modified_time" content="2020-08-23T15:45:59.877Z">
+<meta property="article:modified_time" content="2022-04-11T14:12:31.236Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="VPN">
 <meta property="article:tag" content="网络">
@@ -200,7 +200,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-23 23:45:59" itemprop="dateModified" datetime="2020-08-23T23:45:59+08:00">2020-08-23</time>
+                <time title="Modified: 2022-04-11 22:12:31" itemprop="dateModified" datetime="2022-04-11T22:12:31+08:00">2022-04-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -228,33 +228,28 @@
 <p><strong>依赖</strong>：Python</p>
 <a id="more"></a>
 
-<p>开始安装：</p>
-<ol>
-<li><h4 id="安装shadowsocks"><a href="#安装shadowsocks" class="headerlink" title="安装shadowsocks"></a>安装shadowsocks</h4><p><code>$ pip install shadowsocks</code></p>
-</li>
-<li><h4 id="配置shadowsocks"><a href="#配置shadowsocks" class="headerlink" title="配置shadowsocks"></a>配置shadowsocks</h4><p>创建shadowsocks.json配置文件</p>
-<p><code>$ vim /etc/shadowsocks.json</code></p>
-<p>配置文件内容：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;server&quot;</span>:<span class="string">&quot;0.0.0.0&quot;</span>,</span><br><span class="line"><span class="attr">&quot;server_port&quot;</span>:<span class="number">443</span>,</span><br><span class="line"><span class="attr">&quot;local_address&quot;</span>:<span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line"><span class="attr">&quot;local_port&quot;</span>:<span class="number">1080</span>,</span><br><span class="line"><span class="attr">&quot;password&quot;</span>:<span class="string">&quot;your_pwd&quot;</span>,</span><br><span class="line"><span class="attr">&quot;timeout&quot;</span>:<span class="number">300</span>,</span><br><span class="line"><span class="attr">&quot;method&quot;</span>:<span class="string">&quot;aes-256-cfb&quot;</span>,</span><br><span class="line"><span class="attr">&quot;fast_open&quot;</span>:<span class="literal">false</span>,</span><br><span class="line"><span class="attr">&quot;workers&quot;</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1-安装shadowsocks"><a href="#1-安装shadowsocks" class="headerlink" title="1. 安装shadowsocks"></a>1. <strong>安装shadowsocks</strong></h2><p>   <code>$ pip install shadowsocks</code></p>
+<h2 id="2-配置shadowsocks"><a href="#2-配置shadowsocks" class="headerlink" title="2. 配置shadowsocks"></a>2. <strong>配置shadowsocks</strong></h2><p>   创建shadowsocks.json配置文件</p>
+<p>   <code>$ vim /etc/shadowsocks.json</code></p>
+<p>   配置文件内容：</p>
+   <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;server&quot;</span>:<span class="string">&quot;0.0.0.0&quot;</span>,</span><br><span class="line"><span class="attr">&quot;server_port&quot;</span>:<span class="number">443</span>,</span><br><span class="line"><span class="attr">&quot;local_address&quot;</span>:<span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line"><span class="attr">&quot;local_port&quot;</span>:<span class="number">1080</span>,</span><br><span class="line"><span class="attr">&quot;password&quot;</span>:<span class="string">&quot;your_pwd&quot;</span>,</span><br><span class="line"><span class="attr">&quot;timeout&quot;</span>:<span class="number">300</span>,</span><br><span class="line"><span class="attr">&quot;method&quot;</span>:<span class="string">&quot;aes-256-cfb&quot;</span>,</span><br><span class="line"><span class="attr">&quot;fast_open&quot;</span>:<span class="literal">false</span>,</span><br><span class="line"><span class="attr">&quot;workers&quot;</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>说明：</p>
+<p>   说明：</p>
 <ul>
-<li>server：服务器 IP地址 （使用0.0.0.0表示本机)</li>
-<li>server_port：服务器使用的端口，建议443，避免被查封（同时注意登陆阿里云控制台，在防火墙中添加443端口，包括tcp和udp两个协议类型）</li>
-<li>password：建议修改为自己的密码</li>
-</ul>
+<li><p>server：服务器 IP地址 （使用0.0.0.0表示本机)</p>
+</li>
+<li><p>server_port：服务器使用的端口，建议443，避免被查封（同时注意登陆阿里云控制台，在防火墙中添加443端口，包括tcp和udp两个协议类型）</p>
+</li>
+<li><p>password：建议修改为自己的密码</p>
 <p><img src="/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/%E9%98%BF%E9%87%8C%E4%BA%91.png" alt="图片无法显示"></p>
 </li>
-<li><h4 id="启动shadowsocks"><a href="#启动shadowsocks" class="headerlink" title="启动shadowsocks"></a>启动shadowsocks</h4><p><code>$ ssserver -c /etc/shadowsocks.json -d start</code></p>
-<p> 关闭shadowsocks</p>
-<p><code>$ ssserver -d stop</code></p>
-</li>
-<li><h4 id="检查服务器端口"><a href="#检查服务器端口" class="headerlink" title="检查服务器端口"></a>检查服务器端口</h4><p>检查服务器相关端口是否在监听</p>
-<p><code>$ netstat -lnp</code></p>
-</li>
-<li><h4 id="配置客户端"><a href="#配置客户端" class="headerlink" title="配置客户端"></a>配置客户端</h4><p><img src="/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF.PNG?100x" alt="图片无法显示"></p>
-</li>
-</ol>
+</ul>
+<h2 id="3-启动shadowsocks"><a href="#3-启动shadowsocks" class="headerlink" title="3. 启动shadowsocks"></a>3. <strong>启动shadowsocks</strong></h2><p>   <code>$ ssserver -c /etc/shadowsocks.json -d start</code></p>
+<pre><code>关闭shadowsocks</code></pre>
+<p>   <code>$ ssserver -d stop</code></p>
+<h2 id="4-检查服务器端口"><a href="#4-检查服务器端口" class="headerlink" title="4. 检查服务器端口"></a>4. <strong>检查服务器端口</strong></h2><p>   检查服务器相关端口是否在监听</p>
+<p>   <code>$ netstat -lnp</code></p>
+<h2 id="5-配置客户端"><a href="#5-配置客户端" class="headerlink" title="5. 配置客户端"></a>5. <strong>配置客户端</strong></h2><p>   <img src="/2020/08/18/20200818%E9%98%BF%E9%87%8C%E4%BA%91%E6%90%AD%E5%BB%BAVPN/%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF.PNG?100x" alt="图片无法显示"></p>
 
     </div>
 
@@ -339,7 +334,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85shadowsocks"><span class="nav-number">1.</span> <span class="nav-text">安装shadowsocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEshadowsocks"><span class="nav-number">2.</span> <span class="nav-text">配置shadowsocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8shadowsocks"><span class="nav-number">3.</span> <span class="nav-text">启动shadowsocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E5%8F%A3"><span class="nav-number">4.</span> <span class="nav-text">检查服务器端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">5.</span> <span class="nav-text">配置客户端</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85shadowsocks"><span class="nav-text">1. 安装shadowsocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%85%8D%E7%BD%AEshadowsocks"><span class="nav-text">2. 配置shadowsocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%90%AF%E5%8A%A8shadowsocks"><span class="nav-text">3. 启动shadowsocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%A3%80%E6%9F%A5%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E5%8F%A3"><span class="nav-text">4. 检查服务器端口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-text">5. 配置客户端</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -355,7 +350,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -368,7 +363,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -403,7 +398,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

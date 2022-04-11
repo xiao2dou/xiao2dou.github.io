@@ -31,7 +31,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/12/20/iterm-ssh-question/WX20201220-220105@2x.png">
 <meta property="og:image" content="http://yoursite.com/2020/12/20/iterm-ssh-question/WX20201220-220910@2x.png">
 <meta property="article:published_time" content="2020-12-20T13:58:23.000Z">
-<meta property="article:modified_time" content="2020-12-20T14:37:42.288Z">
+<meta property="article:modified_time" content="2022-04-11T13:53:49.039Z">
 <meta property="article:author" content="Cido Liu">
 <meta property="article:tag" content="开发环境">
 <meta property="article:tag" content="MacBook">
@@ -193,10 +193,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-12-20 21:58:23 / Modified: 22:37:42" itemprop="dateCreated datePublished" datetime="2020-12-20T21:58:23+08:00">2020-12-20</time>
+              <time title="Created: 2020-12-20 21:58:23" itemprop="dateCreated datePublished" datetime="2020-12-20T21:58:23+08:00">2020-12-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 21:53:49" itemprop="dateModified" datetime="2022-04-11T21:53:49+08:00">2022-04-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -223,7 +229,7 @@
 
 <p><strong>前提：安装配置好lrzsz，参考<a target="_blank" rel="noopener" href="https://github.com/aikuyun/iterm2-zmodem">GitHub iterm2-zmodem</a>。</strong></p>
 <h2 id="方法一-最简单的方法"><a href="#方法一-最简单的方法" class="headerlink" title="方法一 最简单的方法"></a>方法一 最简单的方法</h2><p>每次连接服务器都输一遍ip和密码，这样要记很多ip，这是绝对不能接受的。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh name@ip</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh name@ip</span><br></pre></td></tr></table></figure>
 
 <h2 id="方法二-使用expect脚本"><a href="#方法二-使用expect脚本" class="headerlink" title="方法二 使用expect脚本"></a>方法二 使用expect脚本</h2><p>通过编写脚本，每次实现自动连接，详细参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/dion-90/articles/8570601.html">🔗</a></p>
 <p>但配置完后，发现rz和sz不能正常工作了，搜索后只知道expect和lrzsz冲突，于是这种方法也被抛弃了。</p>
@@ -234,9 +240,11 @@
 <h3 id="详细的坑描述：🔗"><a href="#详细的坑描述：🔗" class="headerlink" title="详细的坑描述：🔗"></a>详细的坑描述：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39953750/article/details/103223332">🔗</a></h3><h2 id="最终解决方案"><a href="#最终解决方案" class="headerlink" title="最终解决方案"></a>最终解决方案</h2><ol>
 <li>安装sshpass</li>
 </ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb</span><br></pre></td></tr></table></figure>
 
-<pre><code> 2. 登陆测试</code></pre>
+<ol start="2">
+<li>登陆测试</li>
+</ol>
 <p>安装完成后，可以使用如下命令登录服务器，将密码写到命令中</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/bin/sshpass -p passwrod ssh userName@ip</span><br></pre></td></tr></table></figure>
 
@@ -331,7 +339,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80-%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">方法一 最简单的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C-%E4%BD%BF%E7%94%A8expect%E8%84%9A%E6%9C%AC"><span class="nav-number">2.</span> <span class="nav-text">方法二 使用expect脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E7%9A%84%E5%9D%91%E6%8F%8F%E8%BF%B0%EF%BC%9A%F0%9F%94%97"><span class="nav-number">2.1.</span> <span class="nav-text">详细的坑描述：🔗</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">最终解决方案</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80-%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-text">方法一 最简单的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C-%E4%BD%BF%E7%94%A8expect%E8%84%9A%E6%9C%AC"><span class="nav-text">方法二 使用expect脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E7%9A%84%E5%9D%91%E6%8F%8F%E8%BF%B0%EF%BC%9A%F0%9F%94%97"><span class="nav-text">详细的坑描述：🔗</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">最终解决方案</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -347,7 +355,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -360,7 +368,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -395,7 +403,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
